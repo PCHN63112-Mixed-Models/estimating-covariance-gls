@@ -368,7 +368,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -384,6 +386,14 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-we-use-gls">When Should We Use GLS?</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -396,6 +406,11 @@
   <section class="tex2jax_ignore mathjax_ignore" id="limitations-of-the-gls-framework">
 <h1>Limitations of the GLS Framework<a class="headerlink" href="#limitations-of-the-gls-framework" title="Link to this heading">#</a></h1>
 <p>…</p>
+<section id="when-should-we-use-gls">
+<h2>When Should We Use GLS?<a class="headerlink" href="#when-should-we-use-gls" title="Link to this heading">#</a></h2>
+<p>GLS is most useful in situations where we know what covariance structure we want to impose on the data and are not as concerned about the model not understanding any form of deeper structure in the data. However, if we do not know the covariance structure and know that the data has a deeper structure that the model should be able to exploit, this is where mixed-effects models come into their own.</p>
+<p>… The problem is that GLS does not know anything about the <em>structure</em> of the data. It has no sense of <em>subjects</em> as the experimental unit, nor the idea that the outcome variable is comprised of clusters of values taken from different subjects who might themselves form clusters of values from larger groups (e.g. patients vs controls). All that GLS knows is that there is a correlation structure that we want to remove. Unfortunately, this lack of appreciation for the structure of the data means that GLS cannot use that structure to its advantage. There is no separation of the information available by pooling observations across subjects, or subjects across groups. In effect, GLS is a very <em>crude</em> solution to a bigger problem with repeated measurements. Namely, that there is a larger <em>hierarchical</em> structure at play that the model should be able to take advantage of. We have seen this in a very general way through small-sample degrees of freedom, but really this is only a <em>symptom</em> of a larger problem. As we will come to learn, mixed-effects models are advantageous precisely <em>because</em> they embed this structure in the model. This has a number of consequences, not least the fact that correlation between measurements from the same experimental unit are <em>automatically</em> embedded in the model. This is not because we tell the model to include correlation, rather it is a <em>natural consequence</em> of the structure of the data. As such, mixed-effects models are useful because features such as correlation are a natural part of the modelling framework, precisely because it does take the structure into account in a way that GLS simply cannot.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -452,6 +467,22 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-we-use-gls">When Should We Use GLS?</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
