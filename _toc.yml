@@ -1,0 +1,12 @@
+# Table of contents
+# Learn more at https://jupyterbook.org/customize/toc.html
+
+format: jb-book
+root: 0.intro
+chapters:
+- file: 1.estimating-sigma
+- file: 2.covariance-solutions
+- file: 1.gls
+- file: 5.gls-R
+- file: 5.gls-limitations
+- file: summary
