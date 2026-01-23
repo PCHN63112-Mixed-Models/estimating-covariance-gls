@@ -477,6 +477,21 @@
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">nlme</span><span class="p">)</span>
 
 <span class="n">gls.mod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">weight</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corCompSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">mice2.long</span><span class="p">)</span>
+<span class="n">lme.mod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">lme</span><span class="p">(</span><span class="n">weight</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">random</span><span class="o">=~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">,</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">mice2.long</span><span class="p">)</span>
+
+<span class="nf">library</span><span class="p">(</span><span class="n">lme4</span><span class="p">)</span>
+<span class="n">lmer.mod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">lmer</span><span class="p">(</span><span class="n">weight</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="p">(</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">mice2.long</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading required package: Matrix
+
+Attaching package: ‘lme4’
+
+The following object is masked from ‘package:nlme’:
+
+    lmList
 </pre></div>
 </div>
 </div>
@@ -530,15 +545,19 @@ Degrees of freedom: 20 total; 18 residual
 <p>Putting aside the inferential issues above, the utility of the GLS framework is that we can simply treat the model in the same way as a result from <code class="docutils literal notranslate"><span class="pre">lm()</span></code>. This means we can compute ANOVA-style tests</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">anova</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1">#Anova(gls.mod)</span>
+<span class="nf">Anova</span><span class="p">(</span><span class="n">lme.mod</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Denom. DF: 18 
-            numDF   F-value p-value
-(Intercept)     1 1800.9410  &lt;.0001
-time            1  652.6124  &lt;.0001
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Analysis of Deviance Table (Type II tests)
+
+Response: weight
+      Chisq Df Pr(&gt;Chisq)    
+time 652.61  1  &lt; 2.2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
 </pre></div>
 </div>
 </div>
@@ -567,7 +586,7 @@ timeafter   184.1755 214.7845
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/c309e16af8030634850d8c697063f95f64c9061bcc0e32ebb391029b0fcded66.png" src="_images/c309e16af8030634850d8c697063f95f64c9061bcc0e32ebb391029b0fcded66.png" />
+<img alt="_images/b62c4f89ffa0585843cd75cd53d2c6c7b8e42886a8ea2a53ce1914ffe0838a05.png" src="_images/b62c4f89ffa0585843cd75cd53d2c6c7b8e42886a8ea2a53ce1914ffe0838a05.png" />
 </div>
 </div>
 <p>and compute follow-up tests using <code class="docutils literal notranslate"><span class="pre">emmeans</span></code><a class="footnote-reference brackets" href="#emmeans-foot" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
