@@ -391,6 +391,8 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-limitations">Practical Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-limitations">Conceptual Limitations</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-we-use-gls">When Should We Use GLS?</a></li>
 </ul>
             </nav>
@@ -405,9 +407,18 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="limitations-of-the-gls-framework">
 <h1>Limitations of the GLS Framework<a class="headerlink" href="#limitations-of-the-gls-framework" title="Link to this heading">#</a></h1>
-<p>…</p>
+<p>…
+These can be split into those limitations that are <em>practical</em> based on how GLS is implemented in <code class="docutils literal notranslate"><span class="pre">R</span></code>, and those limitations that are <em>conceptual</em> and apply irrespective of an specific implementation in software.</p>
+<section id="practical-limitations">
+<h2>Practical Limitations<a class="headerlink" href="#practical-limitations" title="Link to this heading">#</a></h2>
+<p>… So, note that these are not necessarily limitations of the <em>framework</em>, but they are limitations based on the <em>choices</em> made when GLS was implemented in <code class="docutils literal notranslate"><span class="pre">R</span></code>. Although someone could quite easily implement a different package that provides GLS functionality, the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function from <code class="docutils literal notranslate"><span class="pre">nlme</span></code> is so ubiquitous and so widely-supported by other packages (e.g. <code class="docutils literal notranslate"><span class="pre">car</span></code>, <code class="docutils literal notranslate"><span class="pre">emmeans</span></code>, <code class="docutils literal notranslate"><span class="pre">effects</span></code> etc.) that this would take time to gain traction and become practically useful. So, for now, it makes most sense to simply treat <code class="docutils literal notranslate"><span class="pre">gls()</span></code> as the only option.</p>
+</section>
+<section id="conceptual-limitations">
+<h2>Conceptual Limitations<a class="headerlink" href="#conceptual-limitations" title="Link to this heading">#</a></h2>
+</section>
 <section id="when-should-we-use-gls">
 <h2>When Should We Use GLS?<a class="headerlink" href="#when-should-we-use-gls" title="Link to this heading">#</a></h2>
+<p>Despite the limitations above, GLS <em>is</em> a useful procedure to know about. Both practically as well as conceptually, as a stepping-stone to mixed-effects models. We will see the conceptual side next week as we move towards a full mixed-effects model. In terms of <em>practically</em>, …</p>
 <p>GLS is most useful in situations where we know what covariance structure we want to impose on the data and are not as concerned about the model not understanding any form of deeper structure in the data. However, if we do not know the covariance structure and know that the data has a deeper structure that the model should be able to exploit, this is where mixed-effects models come into their own.</p>
 <p>… The problem is that GLS does not know anything about the <em>structure</em> of the data. It has no sense of <em>subjects</em> as the experimental unit, nor the idea that the outcome variable is comprised of clusters of values taken from different subjects who might themselves form clusters of values from larger groups (e.g. patients vs controls). All that GLS knows is that there is a correlation structure that we want to remove. Unfortunately, this lack of appreciation for the structure of the data means that GLS cannot use that structure to its advantage. There is no separation of the information available by pooling observations across subjects, or subjects across groups. In effect, GLS is a very <em>crude</em> solution to a bigger problem with repeated measurements. Namely, that there is a larger <em>hierarchical</em> structure at play that the model should be able to take advantage of. We have seen this in a very general way through small-sample degrees of freedom, but really this is only a <em>symptom</em> of a larger problem. As we will come to learn, mixed-effects models are advantageous precisely <em>because</em> they embed this structure in the model. This has a number of consequences, not least the fact that correlation between measurements from the same experimental unit are <em>automatically</em> embedded in the model. This is not because we tell the model to include correlation, rather it is a <em>natural consequence</em> of the structure of the data. As such, mixed-effects models are useful because features such as correlation are a natural part of the modelling framework, precisely because it does take the structure into account in a way that GLS simply cannot.</p>
 </section>
@@ -478,6 +489,8 @@
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-limitations">Practical Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-limitations">Conceptual Limitations</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-we-use-gls">When Should We Use GLS?</a></li>
 </ul>
   </nav></div>
