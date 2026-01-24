@@ -394,10 +394,15 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gls-theory">GLS Theory</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-does-gls-do">What Does GLS Do?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-does-gls-work">How Does GLS Work?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feasible-gls-fgls">Feasible GLS (FGLS)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-constraints">Covariance Constraints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-constraints">Covariance Constraints</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blocked-covariance-structures">Blocked Covariance Structures</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-general-covariance-structures">More General Covariance Structures</a></li>
+</ul>
+</li>
 </ul>
             </nav>
         </div>
@@ -411,7 +416,13 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="generalised-least-squares-gls">
 <h1>Generalised Least Squares (GLS)<a class="headerlink" href="#generalised-least-squares-gls" title="Link to this heading">#</a></h1>
-<p>We will start our journey into the world of mixed-effects models by first examining a <em>related</em> approach that we have seen before: Generalised Least Squares (GLS). The reason for doing this is twofold. Firstly, GLS actually provides a simpler solution to many of the issues with the repeated measures ANOVA and thus presents a more logical starting point. Secondly, limitations in the way that GLS does this will provide some motivation for mixed-effects as a more complex, but ultimately more flexible, method of dealing with this problem.</p>
+<p>In the previous parts of this lesson, we discussed the idea of using more flexible covariance structures to model repeated measures data. Although desirable from a theoretical perspective, we saw that this causes problems in practice when it came to applying the classical inferential framework. So, we already start with a degree of <em>tension</em> between our <em>model</em> and the process of <em>inference</em> based on that model. To begin with, however, we will put that tension to one side and focus only on the <em>model</em>. From this perspective, our aim is not to calculate a <span class="math notranslate nohighlight">\(p\)</span>-value or a confidence interval, it is to build something that can accurately capture the <em>data-generating process</em>. We will worry about the process of inductive inference later.</p>
+<p>Although our general theme on this part of the unit is <em>mixed-effects models</em>, we are not quite there yet. So far, our journey has been to examine the <em>traditional</em> methods of capturing repeated measurements, in the form of the <em>paired <span class="math notranslate nohighlight">\(t\)</span>-test</em> and <em>repeated measures ANOVA</em>. Our conclusion was that these methods suffer from two problematic quirks that we would like to address:</p>
+<ol class="arabic simple">
+<li><p>They require a <em>partitioning</em> of the error within a framework that doesn’t allow this, leading to the awkward inclusion of error terms (e.g. <code class="docutils literal notranslate"><span class="pre">subject</span></code>) within the mean structure, and the manual assignment of numerators and denominators across multiple ANOVA tables.</p></li>
+<li><p>They make very <em>simplistic</em> assumptions about the covariance structure that are unlikely to hold in reality.</p></li>
+</ol>
+<p>Although mixed-effects models do address <em>both</em> of these issues (as we will see later), so too does a much more straightforward approach that we are already familiar with: Generalised Least Squares (GLS). As such, GLS presents a more logical starting point for addressing the issues we have identified. Indeed, this is useful because solving the two points above is <em>not</em> the main justification for using mixed-effects models. In fact, the justification is <em>not</em> that mixed-effects are better than GLS for every dataset, it is that mixed-effects are generally <em>more flexible</em> for complex data structures. However, this flexibility also comes at a price. So, there are times when GLS may actually be the better solution and we should not default to <em>mixed-effects</em> whenever we simply want a more general covariance structure.</p>
 <section id="gls-theory">
 <h2>GLS Theory<a class="headerlink" href="#gls-theory" title="Link to this heading">#</a></h2>
 <p>We previously came across GLS in the context of allowing different variances for different groups of data in ANOVA-type models. This was motivated as a way of lifting the assumption of <em>homogeneity of variance</em>. However, GLS is actually a much more general technique. To see this, note that the probability model for GLS is</p>
@@ -419,47 +430,90 @@
 \[
 \mathbf{y} \sim \mathcal{N}\left(\boldsymbol{\mu},\boldsymbol{\Sigma}\right),
 \]</div>
-<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> can take on <em>any structure</em>. In other words, GLS has exactly the same probability model as the normal linear model, except that it allows for a flexible specification of the variance-covariance matrix. In our previous examples, we used GLS to populate the variance-covariance matrix with different variances for each group. For instance, if we had two groups with three subjects each, our GLS model would be</p>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> can take on <em>any structure</em>. In other words, GLS has exactly the same probability model as the normal linear model, except that it allows for a flexible specification of the variance-covariance matrix. Importantly, this is done <em>without</em> an explicit partitioning of the error. So, a GLS version of the one-way repeated-measures ANOVA model would be</p>
+<div class="math notranslate nohighlight">
+\[
+y_{ij} = \mu + \alpha_{j} + \epsilon_{ij},
+\]</div>
+<p>for subject <span class="math notranslate nohighlight">\(i\)</span> in repeated measures condition <span class="math notranslate nohighlight">\(j\)</span>. Notice that there is <em>no</em> subject-specific term here. Indeed, the mean structure is <em>identical</em> to an independent one-way ANOVA model. This is as it should be, given that we know that correlation does not affect the <em>mean function</em>. So, the difference here lies in the <em>variance function</em>. Under GLS, the <em>vector</em> of errors is assumed</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{\epsilon} \sim \mathcal{N}\left(\mathbf{0},\boldsymbol{\Sigma}\right)
+\]</div>
+<p>where <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> can take on any structure that can be estimated from the data. For instance, we could specify a block-diagonal matrix that was unstructured within each subject, and 0 everywhere else. If we had 3 repeated measurements per-subject, we can express the block associated with subject <span class="math notranslate nohighlight">\(i\)</span> as</p>
+<div class="math notranslate nohighlight">
+\[
+\boldsymbol{\epsilon}_{i} \sim \mathcal{N}\left(\mathbf{0},\boldsymbol{\Sigma}_{i}\right)
+\]</div>
+<p>which can be expanded to</p>
 <div class="math notranslate nohighlight">
 \[\begin{split}
 \begin{bmatrix}
-y_{11} \\
-y_{21} \\
-y_{31} \\
-y_{12} \\
-y_{22} \\
-y_{32} \\
+    \epsilon_{i1} \\
+    \epsilon_{i2} \\
+    \epsilon_{i3} \\
 \end{bmatrix}
-\sim\mathcal{N}\left(
+\sim \mathcal{N}\left(
 \begin{bmatrix}
-\mu_{1} \\
-\mu_{1} \\
-\mu_{1} \\
-\mu_{2} \\
-\mu_{2} \\
-\mu_{2} \\
-\end{bmatrix},
+    0 \\
+    0 \\
+    0 \\
+\end{bmatrix}, 
 \begin{bmatrix}
-\sigma^{2}_{1}  &amp; 0              &amp; 0              &amp; 0              &amp; 0              &amp; 0              \\
-0               &amp; \sigma^{2}_{1} &amp; 0              &amp; 0              &amp; 0              &amp; 0              \\
-0               &amp; 0              &amp; \sigma^{2}_{1} &amp; 0              &amp; 0              &amp; 0              \\
-0               &amp; 0              &amp; 0              &amp; \sigma^{2}_{2} &amp; 0              &amp; 0              \\
-0               &amp; 0              &amp; 0              &amp; 0              &amp; \sigma^{2}_{2} &amp; 0              \\
-0               &amp; 0              &amp; 0              &amp; 0              &amp; 0              &amp; \sigma^{2}_{2} \\
+    \sigma^{2}_{1} &amp; \sigma_{12}    &amp; \sigma_{13}    \\
+    \sigma_{12}    &amp; \sigma^{2}_{2} &amp; \sigma_{23}    \\
+    \sigma_{13}    &amp; \sigma_{23}    &amp; \sigma^{2}_{3} \\
 \end{bmatrix}
 \right).
 \end{split}\]</div>
-<p>This was actually a special case of GLS known as <em>weighted least squares</em> (WLS)[^weights-foot], where all the off-diagonal elements of <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> are 0. However, the crucial point is that  we can use GLS to impose differences in <em>both</em> the variances <em>and</em> the covariances. So while we did not do this previously, we can include <em>correlation</em> in the GLS model. Thus, if our general problem with repeated measures is that the variance-covariance structure is not correctly handled by the normal linear model, GLS provides a direct solution. Furthermore, if a core complaint of the repeated measures ANOVA is that the assumed covariance structure is too restrictive, GLS again provides a direct solution. So, on the face of it, GLS directly solves many of the issues we encountered last week.</p>
-<section id="what-does-gls-do">
-<h3>What Does GLS Do?<a class="headerlink" href="#what-does-gls-do" title="Link to this heading">#</a></h3>
-<p>Technically, the machinery behind GLS is based on assuming we know <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> <em>a priori</em>. Although this would seem a silly place to start (given that we will almost <em>never</em> know this), we can go along with it and see where it gets us. So, <em>if</em> we know what the true covariance structure is, GLS provides a way of <em>removing</em> it from the data[^white-foot]. Once removed, the errors return to <span class="math notranslate nohighlight">\(i.i.d.\)</span> and we are back in the world of the normal linear model. This is a very enticing prospect because all the difficulties associated with correlation effectively <em>disappear</em> and we can treat the data as a regular collection of independent values. So, although this <em>removal</em> procedure happens behind the scenes, we can conceptualise GLS as effectively a <em>transformation</em> that treats the covariance structure as <em>nuisance</em> and removes it, allowing all the theory from last semester to still apply.</p>
-<p>Unfortunately, this only really works is we <em>know</em> <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span>. In the real world, where we never know <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span>, we cannot technically use GLS. This would seem a bit of a dead-end. However, it is possible to use a method such as REML to <em>estimate</em> <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> from the data. This is known as <em>feasible generalised least squares</em> (FGLS). The question then becomes, how does working with <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\Sigma}}\)</span> rather than <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> change things? This is actually a much bigger question that extends to <em>any</em> method where we allow for a completely arbitrary covariance structure, rather than restricting it to a very specific form. Although our complaint about repeated measures ANOVA was that the covariance assumptions were unrealistic, as it turns out, these assumptions are <em>essential</em> to prevent the exact inferential machinery used within the linear model from breaking. Our desire for generality comes at a cost, as we will now discuss.</p>
+<p>Crucially, there is no restriction on the form that <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}_{i}\)</span> takes. So there is no need for this to be <em>compound symmetric</em> or <em>spherical</em>. We can let there be <em>any</em> correlation between the repeated measurement conditions, as well as <em>different variances</em> for each condition. This is because the covariance structure is formed <em>directly</em> and is an <em>explicit</em> part of the model. This is in direct opposition to the repeated measures ANOVA, where the covariance structure is simply <em>implied</em> and is formed <em>indirectly</em> from the partitioned errors.</p>
+<p>So, we can already see two key advantages here. Firstly, we do not need to partition the error and include messy <code class="docutils literal notranslate"><span class="pre">subject</span></code> terms within the mean function. Secondly, we do not need to make a restrictive assumption about the correlational structure of the data. Another key advantage is that the GLS standard errors are formed <em>using <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span></em>. This means that the correlational structure is <em>automatically</em> taken into account. This is true of the standard errors of the parameter estimates, but <em>also</em> extends to ANOVA-style omnibus tests. This means the correct error term can be <em>automatically</em> determined for each test and we do not need multiple ANOVA tables with manual assignment of denominators. The model will take care of it all for us. So, GLS would appear to solve all the issues we had previously with the repeated measures ANOVA.</p>
+<section id="how-does-gls-work">
+<h3>How Does GLS Work?<a class="headerlink" href="#how-does-gls-work" title="Link to this heading">#</a></h3>
+<p>In order to get a sense of how GLS works, we need to start with the unrealistic assumption that we <em>know</em> <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span>. In other words, we know <em>exactly</em> what the population variances and covariances are between the repeated measures conditions. So, the only unknowns in our model are the parameters of the mean function. Although fanciful, we have seen this sort of thing before and is an approach typical of how these sorts of problems are addressed. We start with some simplifying assumptions to allow us to calculate what we need. We then see what happens when those assumptions are <em>lifted</em>.</p>
+<p>So, let us work through what happens when we <em>know</em> <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> precisely. In this situation, GLS is nothing more than a <em>transformation</em> of the model and the data. This is based on the idea that it is possible to find a matrix called <span class="math notranslate nohighlight">\(\mathbf{W}\)</span> which can be used to <em>pre-multiply</em> the data and the model to <em>remove</em> the covariance structure. This pre-multiplication is then equivalent to pre-multiplying the <em>errors</em>, which then removes all correlation and variance differences. For example, returning to subject <span class="math notranslate nohighlight">\(i\)</span> from the one-way ANOVA example above, we originally had</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\text{Var}\left(\epsilon_{i}\right) = 
+\begin{bmatrix}
+    \sigma^{2}_{1} &amp; \sigma_{12}    &amp; \sigma_{13}    \\
+    \sigma_{12}    &amp; \sigma^{2}_{2} &amp; \sigma_{23}    \\
+    \sigma_{13}    &amp; \sigma_{23}    &amp; \sigma^{2}_{3} \\
+\end{bmatrix}.
+\end{split}\]</div>
+<p>If we now correct both the <em>data</em> and the <em>model</em>, the new errors are equivalent to a <em>transformed</em> version of the form</p>
+<div class="math notranslate nohighlight">
+\[
+\epsilon_{i}^{\star} = \mathbf{W}_{i} \times \epsilon_{i},
+\]</div>
+<p>which has the following covariance structure</p>
+<div class="math notranslate nohighlight">
+\[\begin{split}
+\text{Var}\left(\epsilon_{i}^{\star}\right) = 
+\begin{bmatrix}
+    \sigma^{2} &amp; 0          &amp; 0          \\
+    0          &amp; \sigma^{2} &amp; 0          \\
+    0          &amp; 0          &amp; \sigma^{2} \\
+\end{bmatrix}.
+\end{split}\]</div>
+<p>So, the basic idea is that if we <em>know</em> the covariance structure, we can therefore <em>remove it</em> from the data. Once we have done that, we have independent data and can simply go back to using the normal linear model. This is a very <em>clean</em> and <em>simple</em> solution to the problem. If the covariance structure is what is causing us issues, we just <em>remove</em> it and then carry on as normal.</p>
+</section>
+<section id="feasible-gls-fgls">
+<h3>Feasible GLS (FGLS)<a class="headerlink" href="#feasible-gls-fgls" title="Link to this heading">#</a></h3>
+<p>Now, what happens in the more <em>realistic</em> scenario when we <em>do not know</em> <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span>?</p>
 </section>
 </section>
 <section id="covariance-constraints">
 <h2>Covariance Constraints<a class="headerlink" href="#covariance-constraints" title="Link to this heading">#</a></h2>
 <p>As well as understanding that the very process of estimating <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> causes problems, we also need to understand that we cannot have free reign to estimate any old covariance structure we like. One of the most important elements to recognise is that some sort of <em>constraint</em> is always needed when estimating a variance-covariance matrix. To see this, note that for a repeated measures experiment there are <span class="math notranslate nohighlight">\(nt \times nt\)</span> values in this matrix. The values above and below the diagonal are a mirror image, so the true number of unknown values is <span class="math notranslate nohighlight">\(\frac{nt(nt + 1)}{2}\)</span>. For instance, if we had <span class="math notranslate nohighlight">\(n = 5\)</span> subjects and <span class="math notranslate nohighlight">\(t = 3\)</span> repeated measures, there would be <span class="math notranslate nohighlight">\(\frac{15 \times 16}{2} = 120\)</span> unique values in the variance-covariance matrix. If we allowed it to be completely unstructured, we would have 120 values to estimate <em>just</em> for the covariance structure. Indeed, this is not really possible unless the amount of data we have <em>exceeds</em> the number of parameters. So, the data itself imposes a <em>constraint</em> on how unstructured the covariance matrix can be.</p>
 <p>Luckily, for most applications, we not only assume that <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> has a block-diagonal structure (so most off-diagonal entries are 0), but that many of the off-diagonal elements are actually <em>identical</em>. We saw this previously with the repeated measures ANOVA. Even though <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> may have <em>hundreds</em> of values we <em>could</em> fill-in, if we assume compound symmetry only within each subject, there are only <em>two</em> covariance parameters to be estimated: <span class="math notranslate nohighlight">\(\sigma^{2}_{b}\)</span> and <span class="math notranslate nohighlight">\(\sigma^{2}_{w}\)</span>. The whole matrix can then be constructed using those two alone. This is an example of <em>extreme simplification</em>, but it does highlight that we generally do not estimate the <em>whole</em> variance-covariance matrix. We only estimate <em>small parts</em> of it. Indeed, making the covariance matrix more general is often a risky move because of the number of additional parameters needed. The more we estimate from the same data, the greater our uncertainty will become because each element of the covariance-matrix is supported by <em>less data</em>. Complexity always comes at a price.</p>
+<section id="blocked-covariance-structures">
+<h3>Blocked Covariance Structures<a class="headerlink" href="#blocked-covariance-structures" title="Link to this heading">#</a></h3>
+</section>
+<section id="more-general-covariance-structures">
+<h3>More General Covariance Structures<a class="headerlink" href="#more-general-covariance-structures" title="Link to this heading">#</a></h3>
+<p>… For instance, one example of data that is correlated but does <em>not</em> fit our usual repeated measures structure is <em>time-series</em> data. … For this, there are special covariance matrices called <em>autoregressive</em> (AR) structures …</p>
+</section>
 </section>
 </section>
 
@@ -529,10 +583,15 @@ y_{32} \\
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#gls-theory">GLS Theory</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#what-does-gls-do">What Does GLS Do?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#how-does-gls-work">How Does GLS Work?</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#feasible-gls-fgls">Feasible GLS (FGLS)</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-constraints">Covariance Constraints</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-constraints">Covariance Constraints</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#blocked-covariance-structures">Blocked Covariance Structures</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#more-general-covariance-structures">More General Covariance Structures</a></li>
+</ul>
+</li>
 </ul>
   </nav></div>
 
