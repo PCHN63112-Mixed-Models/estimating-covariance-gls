@@ -393,12 +393,14 @@
             </div>
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-paired-t-test-using-gls">The Paired <span class="math notranslate nohighlight">\(t\)</span>-test Using GLS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-using-gls">Inference Using GLS</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#omnibus-tests-and-follow-ups">Omnibus Tests and Follow-ups</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gls-one-way-anova">The GLS One-way ANOVA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-paired-t-test-using-gls">The Paired <span class="math notranslate nohighlight">\(t\)</span>-test Using GLS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-using-gls">Inference Using GLS</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#omnibus-tests-and-follow-ups">Omnibus Tests and Follow-ups</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#one-way-anova-using-gls">One-way ANOVA Using GLS</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-estimated-covariance-structure">Viewing the Estimated Covariance Structure</a></li>
 </ul>
             </nav>
@@ -415,8 +417,10 @@
 <h1>Using GLS in <code class="docutils literal notranslate"><span class="pre">R</span></code><a class="headerlink" href="#using-gls-in-r" title="Link to this heading">#</a></h1>
 <p>…</p>
 <p>We have seen some examples of using the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function from <code class="docutils literal notranslate"><span class="pre">nlme</span></code> last semester. At that point, we only focused on the use of the <code class="docutils literal notranslate"><span class="pre">weights=</span></code> argument with different variance structures (e.g. <code class="docutils literal notranslate"><span class="pre">varIdent()</span></code>, <code class="docutils literal notranslate"><span class="pre">varPower()</span></code> etc.). However, there is also a <code class="docutils literal notranslate"><span class="pre">correlation=</span></code> argument that similarly takes a number of pre-specified correlation structures. We can use these two arguments together to form a final variance-covariance matrix that consists of correlation and heterogenous variance groups.</p>
+<section id="the-gls-one-way-anova">
+<h2>The GLS One-way ANOVA<a class="headerlink" href="#the-gls-one-way-anova" title="Link to this heading">#</a></h2>
 <section id="the-paired-t-test-using-gls">
-<h2>The Paired <span class="math notranslate nohighlight">\(t\)</span>-test Using GLS<a class="headerlink" href="#the-paired-t-test-using-gls" title="Link to this heading">#</a></h2>
+<h3>The Paired <span class="math notranslate nohighlight">\(t\)</span>-test Using GLS<a class="headerlink" href="#the-paired-t-test-using-gls" title="Link to this heading">#</a></h3>
 <p>We can start with the most simple example of the paired <span class="math notranslate nohighlight">\(t\)</span>-test using GLS. Importantly, this is an unnecessary step theoretically because the paired <span class="math notranslate nohighlight">\(t\)</span>-test is a perfectly acceptable technique. When there are only two-repeats there are no arguments about the covariance structure. There can only be a single correlation term. So compound symmetry always works. However, it is useful for us as a <em>starting point</em> because it is the simplest example of the problem.</p>
 <p>In order to specify a correlation structure, we need to pass one of the predefined correlation functions as an argument to <code class="docutils literal notranslate"><span class="pre">correlation=</span></code>. These structures include functions such as <code class="docutils literal notranslate"><span class="pre">corCompSymm()</span></code>, <code class="docutils literal notranslate"><span class="pre">corSpher()</span></code>, <code class="docutils literal notranslate"><span class="pre">corAR1()</span></code> and <code class="docutils literal notranslate"><span class="pre">corSymm()</span></code><a class="footnote-reference brackets" href="#corfunc-foot" id="id1" role="doc-noteref"><span class="fn-bracket">[</span>1<span class="fn-bracket">]</span></a>. For this example, we will use <code class="docutils literal notranslate"><span class="pre">corCompSymm()</span></code>, which constructs a compound symmetric structure.</p>
 <p>In order to use <code class="docutils literal notranslate"><span class="pre">corCompSymm()</span></code>, we need to supply it with a description of how we want it structured in relation to our data. This is done using the <code class="docutils literal notranslate"><span class="pre">form=</span></code> argument, which takes a one-sided formula expressing the structure we want. For this example, we will use <code class="docutils literal notranslate"><span class="pre">corCompSymm(form=</span> <span class="pre">~1|subject)</span></code>. This indicates that we want a constant correlation (<code class="docutils literal notranslate"><span class="pre">1</span></code>) grouped by subject (<code class="docutils literal notranslate"><span class="pre">|subject</span></code>). So, the term on the <em>right</em> of <code class="docutils literal notranslate"><span class="pre">|</span></code> is key here. This gives a <em>grouping factor</em> such that any observations from the same level will share a constant correlation. Because we have used <code class="docutils literal notranslate"><span class="pre">subject</span></code>, each level represents a <em>different</em> subject and thus any observations that come from the same subject will be correlated. This therefore defines our <em>block-diagonal</em> covariance structure, where the term on the right of <code class="docutils literal notranslate"><span class="pre">|</span></code> forms the <em>blocks</em>. We will see ways to visualise this in order to provide more intuition a little later.</p>
@@ -499,11 +503,12 @@ The following object is masked from ‘package:nlme’:
 <p>where we can see the use of the <code class="docutils literal notranslate"><span class="pre">correlation=</span></code> argument with the <code class="docutils literal notranslate"><span class="pre">corCompSymm()</span></code> function. We could also optionally include a <code class="docutils literal notranslate"><span class="pre">weights=</span></code> argument if we wanted the diagonal elements of the covariance matrix to differ by <code class="docutils literal notranslate"><span class="pre">time</span></code>. This would take the form <code class="docutils literal notranslate"><span class="pre">weights=varIdent(form=</span> <span class="pre">~1|time)</span></code>. However, we will keep this simple for now.</p>
 </section>
 <section id="inference-using-gls">
-<h2>Inference Using GLS<a class="headerlink" href="#inference-using-gls" title="Link to this heading">#</a></h2>
+<h3>Inference Using GLS<a class="headerlink" href="#inference-using-gls" title="Link to this heading">#</a></h3>
 <p>Although we should check the assumptions of the GLS model, we will leave that to one side given that we covered it last semester. The more pressing issue for us is to discuss <em>inference</em> using the GLS model, especially given the problems highlighted earlier. To begin with, we can treat the returned objects from <code class="docutils literal notranslate"><span class="pre">gls()</span></code> just like an object from <code class="docutils literal notranslate"><span class="pre">lm()</span></code> and call <code class="docutils literal notranslate"><span class="pre">summary()</span></code> to examine the model estimates and tests.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">summary</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">summary</span><span class="p">(</span><span class="n">lmer.mod</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
@@ -535,29 +540,77 @@ Standardized residuals:
 
 Residual standard error: 25.55725 
 Degrees of freedom: 20 total; 18 residual
+Linear mixed model fit by REML [&#39;lmerMod&#39;]
+Formula: weight ~ time + (1 | id)
+   Data: mice2.long
+
+REML criterion at convergence: 169.3
+
+Scaled residuals: 
+     Min       1Q   Median       3Q      Max 
+-1.79385 -0.43920  0.09593  0.40212  1.36655 
+
+Random effects:
+ Groups   Name        Variance Std.Dev.
+ id       (Intercept) 348.3    18.66   
+ Residual             304.9    17.46   
+Number of obs: 20, groups:  id, 10
+
+Fixed effects:
+            Estimate Std. Error t value
+(Intercept)  200.560      8.082   24.82
+timeafter    199.480      7.809   25.55
+
+Correlation of Fixed Effects:
+          (Intr)
+timeafter -0.483
 </pre></div>
 </div>
 </div>
 </div>
 <p>We can see here all the usual output that matches what <code class="docutils literal notranslate"><span class="pre">lm()</span></code> gives us. Indeed, despite what we mentioned earlier, we still get <span class="math notranslate nohighlight">\(t\)</span>-statistics and <span class="math notranslate nohighlight">\(p\)</span>-values (though note that the <span class="math notranslate nohighlight">\(p\)</span>-values are <em>rounded</em> rather than displayed using scientific notation). We also have information on the estimated correlation structure, with the single correlation parameter given by <span class="math notranslate nohighlight">\(\hat{\rho} = 0.53\)</span>. Of most importance is that both the <em>standard error</em> and <em><span class="math notranslate nohighlight">\(t\)</span>-value</em> match what we saw last week from the paired <span class="math notranslate nohighlight">\(t\)</span>-test. This is evidence enough to show that the correlation <em>is</em> being taken into account. Importantly, this is being done within a linear model framework, but <em>without</em> the need to subtract the differences <em>or</em> to manually partition the errors by including <code class="docutils literal notranslate"><span class="pre">id</span></code> in the model formula.</p>
 <section id="omnibus-tests-and-follow-ups">
-<h3>Omnibus Tests and Follow-ups<a class="headerlink" href="#omnibus-tests-and-follow-ups" title="Link to this heading">#</a></h3>
+<h4>Omnibus Tests and Follow-ups<a class="headerlink" href="#omnibus-tests-and-follow-ups" title="Link to this heading">#</a></h4>
 <p>Putting aside the inferential issues above, the utility of the GLS framework is that we can simply treat the model in the same way as a result from <code class="docutils literal notranslate"><span class="pre">lm()</span></code>. This means we can compute ANOVA-style tests</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="c1">#Anova(gls.mod)</span>
-<span class="nf">Anova</span><span class="p">(</span><span class="n">lme.mod</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">joint_tests</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">))</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">Anova</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">))</span>
+<span class="c1">#Anova(lme.mod)</span>
+<span class="c1">#anova(lmer.mod)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Analysis of Deviance Table (Type II tests)
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> model term df1 df2 F.ratio p.value
+ time         1   9 652.612  &lt;.0001
+
+Analysis of Deviance Table (Type II tests)
 
 Response: weight
-      Chisq Df Pr(&gt;Chisq)    
-time 652.61  1  &lt; 2.2e-16 ***
+     Df  Chisq Pr(&gt;Chisq)    
+time  1 652.61  &lt; 2.2e-16 ***
 ---
 Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">anova.tbl</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">anova</span><span class="p">(</span><span class="n">lmer.mod</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">anova.tbl</span><span class="o">$</span><span class="n">`F value`</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>[1] 652.6133
 </pre></div>
 </div>
 </div>
@@ -586,7 +639,7 @@ timeafter   184.1755 214.7845
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/b62c4f89ffa0585843cd75cd53d2c6c7b8e42886a8ea2a53ce1914ffe0838a05.png" src="_images/b62c4f89ffa0585843cd75cd53d2c6c7b8e42886a8ea2a53ce1914ffe0838a05.png" />
+<img alt="_images/94be4ea3b881757bc0afe5d6c46cc482c49a6031d0c5270d468d6d02b9697fba.png" src="_images/94be4ea3b881757bc0afe5d6c46cc482c49a6031d0c5270d468d6d02b9697fba.png" />
 </div>
 </div>
 <p>and compute follow-up tests using <code class="docutils literal notranslate"><span class="pre">emmeans</span></code><a class="footnote-reference brackets" href="#emmeans-foot" id="id2" role="doc-noteref"><span class="fn-bracket">[</span>2<span class="fn-bracket">]</span></a></p>
@@ -611,8 +664,6 @@ Degrees-of-freedom method: asymptotic
 <p>So, if we put the inferential issues to one side, we can see that GLS provides a nice alternative to the repeated measures ANOVA because it exists within the linear model framework and thus allows us to use all the methods we have seen previously. Furthermore, we can lift the assumption of compound symmetry and use a variety of different covariance matrices. The main downside is that this comes with a price in terms of the <span class="math notranslate nohighlight">\(p\)</span>-value not taking the uncertainty in the estimation of the covariance structure into account. This is especially problematic in <em>small samples</em>, which means we should really treat the hypothesis tests from a GLS model as only <em>asymptotically correct</em>. If we are happy to do so, GLS becomes quite a useful method to have on hand. We will see a few more examples of using GLS with more complex ANOVA models in the associated workshop.</p>
 </section>
 </section>
-<section id="one-way-anova-using-gls">
-<h2>One-way ANOVA Using GLS<a class="headerlink" href="#one-way-anova-using-gls" title="Link to this heading">#</a></h2>
 </section>
 <section id="viewing-the-estimated-covariance-structure">
 <h2>Viewing the Estimated Covariance Structure<a class="headerlink" href="#viewing-the-estimated-covariance-structure" title="Link to this heading">#</a></h2>
@@ -695,12 +746,14 @@ Degrees-of-freedom method: asymptotic
   </div>
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-paired-t-test-using-gls">The Paired <span class="math notranslate nohighlight">\(t\)</span>-test Using GLS</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-using-gls">Inference Using GLS</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#omnibus-tests-and-follow-ups">Omnibus Tests and Follow-ups</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gls-one-way-anova">The GLS One-way ANOVA</a><ul class="nav section-nav flex-column">
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#the-paired-t-test-using-gls">The Paired <span class="math notranslate nohighlight">\(t\)</span>-test Using GLS</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-using-gls">Inference Using GLS</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#omnibus-tests-and-follow-ups">Omnibus Tests and Follow-ups</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#one-way-anova-using-gls">One-way ANOVA Using GLS</a></li>
+</ul>
+</li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-estimated-covariance-structure">Viewing the Estimated Covariance Structure</a></li>
 </ul>
   </nav></div>
