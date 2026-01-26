@@ -402,6 +402,7 @@
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-estimated-covariance-structure">Viewing the Estimated Covariance Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-covariance-structures">Comparing Covariance Structures</a></li>
 </ul>
             </nav>
         </div>
@@ -415,8 +416,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="using-gls-in-r">
 <h1>Using GLS in <code class="docutils literal notranslate"><span class="pre">R</span></code><a class="headerlink" href="#using-gls-in-r" title="Link to this heading">#</a></h1>
-<p>…</p>
-<p>We have seen some examples of using the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function from <code class="docutils literal notranslate"><span class="pre">nlme</span></code> last semester. At that point, we only focused on the use of the <code class="docutils literal notranslate"><span class="pre">weights=</span></code> argument with different variance structures (e.g. <code class="docutils literal notranslate"><span class="pre">varIdent()</span></code>, <code class="docutils literal notranslate"><span class="pre">varPower()</span></code> etc.). However, there is also a <code class="docutils literal notranslate"><span class="pre">correlation=</span></code> argument that similarly takes a number of pre-specified correlation structures. We can use these two arguments together to form a final variance-covariance matrix that consists of correlation and heterogenous variance groups.</p>
+<p>In the previous part of this lesson, we discussed the theory behind GLS. Now we turn to how GLS is implemented within <code class="docutils literal notranslate"><span class="pre">R</span></code>. We saw some examples of using the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function from <code class="docutils literal notranslate"><span class="pre">nlme</span></code> last semester. At that point, we only focused on the use of the <code class="docutils literal notranslate"><span class="pre">weights=</span></code> argument with different variance structures (e.g. <code class="docutils literal notranslate"><span class="pre">varIdent()</span></code>, <code class="docutils literal notranslate"><span class="pre">varPower()</span></code> etc.). However, there is also a <code class="docutils literal notranslate"><span class="pre">correlation=</span></code> argument that similarly takes a number of pre-specified correlation structures. We can use these two arguments together to form a final variance-covariance matrix that consists of <em>both</em> correlation and heterogenous variance groups. In this part of the lesson, we will explore <code class="docutils literal notranslate"><span class="pre">gls()</span></code> further using a simple repeated measures one-way ANOVA model. We will see examples of using <code class="docutils literal notranslate"><span class="pre">gls()</span></code> on more complex datasets in the workshop this week.</p>
 <section id="the-gls-one-way-anova">
 <h2>The GLS One-way ANOVA<a class="headerlink" href="#the-gls-one-way-anova" title="Link to this heading">#</a></h2>
 <section id="the-paired-t-test-using-gls">
@@ -667,6 +667,9 @@ Degrees-of-freedom method: asymptotic
 </section>
 <section id="viewing-the-estimated-covariance-structure">
 <h2>Viewing the Estimated Covariance Structure<a class="headerlink" href="#viewing-the-estimated-covariance-structure" title="Link to this heading">#</a></h2>
+</section>
+<section id="comparing-covariance-structures">
+<h2>Comparing Covariance Structures<a class="headerlink" href="#comparing-covariance-structures" title="Link to this heading">#</a></h2>
 <hr class="footnotes docutils" />
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="corfunc-foot" role="note">
@@ -755,6 +758,7 @@ Degrees-of-freedom method: asymptotic
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-estimated-covariance-structure">Viewing the Estimated Covariance Structure</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-covariance-structures">Comparing Covariance Structures</a></li>
 </ul>
   </nav></div>
 

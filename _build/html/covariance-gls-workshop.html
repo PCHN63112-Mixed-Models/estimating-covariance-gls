@@ -65,7 +65,7 @@
     <script>const THEBE_JS_URL = "https://unpkg.com/thebe@0.8.2/lib/index.js"; const thebe_selector = ".thebe,.cell"; const thebe_selector_input = "pre"; const thebe_selector_output = ".output, .cell_output"</script>
     <script>window.MathJax = {"options": {"processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
     <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
-    <script>DOCUMENTATION_OPTIONS.pagename = 'intro-mixed-workshop';</script>
+    <script>DOCUMENTATION_OPTIONS.pagename = 'covariance-gls-workshop';</script>
     <script src="_static/sphericity_3d_files/rglwidgetClass-1.3.18/textures.src.js?v=9482728f"></script>
     <script src="_static/sphericity_3d_files/rglwidgetClass-1.3.18/shadersrc.src.js?v=6ce05c17"></script>
     <script src="_static/sphericity_3d_files/rglwidgetClass-1.3.18/buffer.src.js?v=1efca185"></script>
@@ -277,7 +277,7 @@
       
       
       
-      <li><a href="https://github.com/PCHN63112-Mixed-Models/estimating-covariance-gls/issues/new?title=Issue%20on%20page%20%2Fintro-mixed-workshop.html&body=Your%20issue%20content%20here." target="_blank"
+      <li><a href="https://github.com/PCHN63112-Mixed-Models/estimating-covariance-gls/issues/new?title=Issue%20on%20page%20%2Fcovariance-gls-workshop.html&body=Your%20issue%20content%20here." target="_blank"
    class="btn btn-sm btn-source-issues-button dropdown-item"
    title="Open an issue"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -307,7 +307,7 @@
       
       
       
-      <li><a href="_sources/intro-mixed-workshop.ipynb" target="_blank"
+      <li><a href="_sources/covariance-gls-workshop.ipynb" target="_blank"
    class="btn btn-sm btn-download-source-button dropdown-item"
    title="Download source file"
    data-bs-placement="left" data-bs-toggle="tooltip"
@@ -397,6 +397,7 @@
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#try-setting-correlation-to-1-what-happens">Try Setting Correlation to 1. What happens?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#univariate-conceptualisation">Univariate Conceptualisation</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#multivariate-normal-distribution-with-2-conditions">Multivariate Normal Distribution with &gt; 2 Conditions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#more-general-covariance-structures">More General Covariance Structures</a></li>
 </ul>
 
             </nav>
@@ -647,6 +648,12 @@
 <section id="multivariate-normal-distribution-with-2-conditions">
 <h1>Multivariate Normal Distribution with &gt; 2 Conditions<a class="headerlink" href="#multivariate-normal-distribution-with-2-conditions" title="Link to this heading">#</a></h1>
 </section>
+<section id="more-general-covariance-structures">
+<h1>More General Covariance Structures<a class="headerlink" href="#more-general-covariance-structures" title="Link to this heading">#</a></h1>
+<p>Although typical of most repeated measures experiments, a block-diagonal structure us not always the most appropriate for correlated data. Although we will not dwell on this, there are types of data <em>other</em> than traditional repeated measurements that are correlated and can be analysed using FGLS. Perhaps the most obvious is <em>time-series</em> data. For instance, imagine that you are taking continuous measurements from a single subject using a technique such as <em>eye-tracking</em>, <em>EEG</em> or <em>fMRI</em>. For each subject, we have repeated measurements that number the <em>hundreds</em> or even <em>thousands</em>. For example, the plot below shows a time-series of measurements using fMRI of a single subject at a single point in the brain.</p>
+<p>…</p>
+<p>The idea is that the values at each point in the time-series are close enough together that they are correlated. However, this correlation decreases the further apart in time the points are. So, two points that are <em>next to each other</em> will be strongly correlated, whereas two points at <em>opposite ends</em> of the time-series will be effectively <em>uncorrelated</em>. There is therefore a <em>decrease in correlation over time</em>. This is known as an <em>autoregressive</em> correlation structure.</p>
+</section>
 
     <script type="text/x-thebe-config">
     {
@@ -699,6 +706,7 @@
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#try-setting-correlation-to-1-what-happens">Try Setting Correlation to 1. What happens?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#univariate-conceptualisation">Univariate Conceptualisation</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#multivariate-normal-distribution-with-2-conditions">Multivariate Normal Distribution with &gt; 2 Conditions</a></li>
+<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#more-general-covariance-structures">More General Covariance Structures</a></li>
 </ul>
 
   </nav></div>
