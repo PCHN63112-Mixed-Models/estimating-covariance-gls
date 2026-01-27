@@ -723,6 +723,63 @@ Residual standard error: 0.8859852
 </section>
 <section id="viewing-the-complete-covariance-structure">
 <h2>Viewing the Complete Covariance Structure<a class="headerlink" href="#viewing-the-complete-covariance-structure" title="Link to this heading">#</a></h2>
+<div class="cell tag_hide-input docutils container">
+<details class="hide above-input">
+<summary aria-label="Toggle hidden content">
+<span class="collapsed">Show code cell source</span>
+<span class="expanded">Hide code cell source</span>
+</summary>
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">Matrix</span><span class="p">)</span>
+
+<span class="n">gls_full_cov</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">  </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">nobs</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1"># Correlation blocks (list) or single matrix if no grouping</span>
+<span class="w">  </span><span class="n">cs</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">fit</span><span class="o">$</span><span class="n">modelStruct</span><span class="o">$</span><span class="n">corStruct</span>
+<span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nf">is.null</span><span class="p">(</span><span class="n">cs</span><span class="p">))</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="c1"># No correlation structure: R = I</span>
+<span class="w">    </span><span class="n">Rlist</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">list</span><span class="p">(</span><span class="n">Matrix</span><span class="o">::</span><span class="nf">Diagonal</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+<span class="w">    </span><span class="n">g</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="nf">rep</span><span class="p">(</span><span class="s">&quot;all&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span><span class="w"> </span><span class="kr">else</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Rlist</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">corMatrix</span><span class="p">(</span><span class="n">cs</span><span class="p">)</span>
+<span class="w">    </span><span class="n">g</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">getGroups</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
+<span class="w">    </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nf">is.null</span><span class="p">(</span><span class="n">g</span><span class="p">))</span><span class="w"> </span><span class="n">g</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">factor</span><span class="p">(</span><span class="nf">rep</span><span class="p">(</span><span class="s">&quot;all&quot;</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">))</span>
+<span class="w">  </span><span class="p">}</span>
+
+<span class="w">  </span><span class="c1"># Variance weights (if no varStruct, all 1s)</span>
+<span class="w">  </span><span class="n">vs</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">fit</span><span class="o">$</span><span class="n">modelStruct</span><span class="o">$</span><span class="n">varStruct</span>
+<span class="w">  </span><span class="n">w</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="nf">is.null</span><span class="p">(</span><span class="n">vs</span><span class="p">))</span><span class="w"> </span><span class="nf">rep</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="w"> </span><span class="n">n</span><span class="p">)</span><span class="w"> </span><span class="kr">else</span><span class="w"> </span><span class="nf">varWeights</span><span class="p">(</span><span class="n">vs</span><span class="p">)</span>
+
+<span class="w">  </span><span class="c1"># Indices per group, aligned to the same order as used in the fit</span>
+<span class="w">  </span><span class="n">idx</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">split</span><span class="p">(</span><span class="nf">seq_along</span><span class="p">(</span><span class="n">g</span><span class="p">),</span><span class="w"> </span><span class="n">g</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">sig2</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">fit</span><span class="o">$</span><span class="n">sigma</span><span class="o">^</span><span class="m">2</span>
+
+<span class="w">  </span><span class="c1"># Build block covariance matrices: Sigma_g = sig2 * D^(1/2) R D^(1/2)</span>
+<span class="w">  </span><span class="c1"># In nlme, varWeights are (typically) inverse-SD-type weights, so Var(e_i) = sig2 / w_i^2.</span>
+<span class="w">  </span><span class="n">Sig_blocks</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">Map</span><span class="p">(</span><span class="kr">function</span><span class="p">(</span><span class="n">R</span><span class="p">,</span><span class="w"> </span><span class="n">ii</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="w">    </span><span class="n">Dhalf</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">Matrix</span><span class="o">::</span><span class="nf">Diagonal</span><span class="p">(</span><span class="n">x</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="m">1</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">w</span><span class="p">[</span><span class="n">ii</span><span class="p">])</span>
+<span class="w">    </span><span class="n">sig2</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="p">(</span><span class="n">Dhalf</span><span class="w"> </span><span class="o">%*%</span><span class="w"> </span><span class="n">R</span><span class="w"> </span><span class="o">%*%</span><span class="w"> </span><span class="n">Dhalf</span><span class="p">)</span>
+<span class="w">  </span><span class="p">},</span><span class="w"> </span><span class="n">Rlist</span><span class="p">,</span><span class="w"> </span><span class="n">idx</span><span class="p">)</span>
+
+<span class="w">  </span><span class="n">Matrix</span><span class="o">::</span><span class="nf">bdiag</span><span class="p">(</span><span class="n">Sig_blocks</span><span class="p">)</span>
+<span class="p">}</span>
+</pre></div>
+</div>
+</div>
+</details>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">image</span><span class="p">(</span><span class="nf">gls_full_cov</span><span class="p">(</span><span class="n">gls.mod.Unconstrained</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/1fd569bbcec7c3b84c916e0b3c704874f5641b652309a4a891a8f2463f25c1ed.png" src="_images/1fd569bbcec7c3b84c916e0b3c704874f5641b652309a4a891a8f2463f25c1ed.png" />
+</div>
+</div>
 </section>
 </section>
 
