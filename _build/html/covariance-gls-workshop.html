@@ -403,14 +403,7 @@
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualising-the-model">Visualising the Model</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-using-gls">Inference Using <code class="docutils literal notranslate"><span class="pre">gls()</span></code></a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coefficient-tests">Coefficient Tests</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#omnibus-tests">Omnibus Tests</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#follow-up-tests">Follow-up Tests</a></li>
-</ul>
-</li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-complete-covariance-structure">Viewing the Complete Covariance Structure</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gls-covariance-matrix">The GLS Covariance Matrix</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#try-setting-correlation-to-1-what-happens">Try Setting Correlation to 1. What happens?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#univariate-conceptualisation">Univariate Conceptualisation</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#multivariate-normal-distribution-with-2-conditions">Multivariate Normal Distribution with &gt; 2 Conditions</a></li>
@@ -552,8 +545,13 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 </section>
 <section id="assumptions-and-visualisations">
 <h1>Assumptions and Visualisations<a class="headerlink" href="#assumptions-and-visualisations" title="Link to this heading">#</a></h1>
+<p>Before we get to discussing the tricky topic of inference, we also need to consider how to check the assumptions and visualise the GLS model. Although the plain <code class="docutils literal notranslate"><span class="pre">lm()</span></code> functions allows a variety of diagnostic plots, calling <code class="docutils literal notranslate"><span class="pre">plot()</span></code> on a GLS model will only give us a single visualisation. As such, if we want something similar we need to construct these plots ourselves, with some caveats.</p>
 <section id="assumptions-plots">
 <h2>Assumptions Plots<a class="headerlink" href="#assumptions-plots" title="Link to this heading">#</a></h2>
+<p>In principle, all the plots we saw previously with <code class="docutils literal notranslate"><span class="pre">lm()</span></code> can still be defined using a model fit using <code class="docutils literal notranslate"><span class="pre">gls()</span></code>. However, there are two important caveats.</p>
+<p>Firstly, this is true only when working with the <em>corrected</em> errors. In other words, the errors that result from <em>removing</em> the covariance structure. Technically, this means we need to assume that the covariance structure we have is <em>correct</em>, as the assumptions of the normal linear model only apply if we have managed to remove the covariance structure <em>perfectly</em>. Given that this is not going to be true under FGLS, we need to be slightly more cautious about the interpretation of these types of plots.</p>
+<p>Secondly, <em>leverage</em> and <em>Cook’s Distance</em> are not defined under GLS. It may be possible to calculate some variant that is <em>similar</em> in spirit, but this is messy and would need to be scripted manually. As such, we will skip the leverage plot and, in its place, provide a visualisation of the covariance structure as a diagnostic measure, to make sure the estimated structure is as expected.</p>
+<p>In the drop-down below is the definition of a function called <code class="docutils literal notranslate"><span class="pre">plot.gls()</span></code> that will create some visualisations that are similar in spirit to those from the normal linear model. These are all calculated using the residuals extracted using <code class="docutils literal notranslate"><span class="pre">resid(mod,</span> <span class="pre">type='normalized')</span></code>, which are residuals that have been <em>corrected</em> for the covariance structure and are <em>standardised</em>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">plot.gls</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">mod</span><span class="p">,</span><span class="w"> </span><span class="n">timeseries</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">){</span>
@@ -565,7 +563,7 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 
 <span class="w">  </span><span class="c1"># Residuals vs fitted</span>
 <span class="w">  </span><span class="nf">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="n">w</span><span class="p">,</span><span class="w"> </span><span class="n">main</span><span class="o">=</span><span class="s">&#39;Residuals vs fitted&#39;</span><span class="p">)</span>
-<span class="w">  </span><span class="nf">abline</span><span class="p">(</span><span class="n">h</span><span class="o">=</span><span class="m">0</span><span class="p">,</span><span class="w"> </span><span class="n">lty</span><span class="o">=</span><span class="m">2</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">lines</span><span class="p">(</span><span class="nf">lowess</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="n">w</span><span class="p">))</span>
 
 <span class="w">  </span><span class="c1"># Normal Q-Q</span>
 <span class="w">  </span><span class="nf">qqnorm</span><span class="p">(</span><span class="n">w</span><span class="p">)</span><span class="w"> </span>
@@ -573,6 +571,7 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 <span class="w">  </span>
 <span class="w">  </span><span class="c1"># Scale-Location</span>
 <span class="w">  </span><span class="nf">plot</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="w"> </span><span class="nf">sqrt</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">w</span><span class="p">)),</span><span class="w"> </span><span class="n">main</span><span class="o">=</span><span class="s">&#39;Scale-Location&#39;</span><span class="p">)</span>
+<span class="w">  </span><span class="nf">lines</span><span class="p">(</span><span class="nf">lowess</span><span class="p">(</span><span class="n">f</span><span class="p">,</span><span class="nf">sqrt</span><span class="p">(</span><span class="nf">abs</span><span class="p">(</span><span class="n">w</span><span class="p">))))</span>
 
 <span class="w">  </span><span class="c1"># Either plot of the ACF, or a visualisation of the marginal covariance structure</span>
 <span class="w">  </span><span class="kr">if</span><span class="w"> </span><span class="p">(</span><span class="n">timeseries</span><span class="o">==</span><span class="kc">TRUE</span><span class="p">){</span>
@@ -586,39 +585,36 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 </div>
 </div>
 </div>
+<p>Applying this function to the results from the model with the unconstrained covariance structure gives</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">plot.gls</span><span class="p">(</span><span class="n">gls.mod.4</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">plot.gls</span><span class="p">(</span><span class="n">gls.mod.Unconstrained</span><span class="w"> </span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/b12ebdc6373c53c653f50bb85a4dfff55178dd42273e003146fd00dd946b6a1a.png" src="_images/b12ebdc6373c53c653f50bb85a4dfff55178dd42273e003146fd00dd946b6a1a.png" />
+<img alt="_images/81c38fad274650ad532deb20fd69831c1a31b9be6f7dc4b12f9c51aa2eabac41.png" src="_images/81c38fad274650ad532deb20fd69831c1a31b9be6f7dc4b12f9c51aa2eabac41.png" />
 </div>
 </div>
+<p>As way of comparison, the model with the compound symmetric structure gives</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">plot.gls</span><span class="p">(</span><span class="n">gls.mod.CompSymm</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/ef8bd934cab9250380d47993b09596d7efb8f2649e4891f1382b210d26880673.png" src="_images/ef8bd934cab9250380d47993b09596d7efb8f2649e4891f1382b210d26880673.png" />
+</div>
+</div>
+<p>which does appear qualitatively <em>worse</em>, thus suggesting that a more complex covariance structure provides a better model fit.</p>
 </section>
 <section id="visualising-the-model">
 <h2>Visualising the Model<a class="headerlink" href="#visualising-the-model" title="Link to this heading">#</a></h2>
 </section>
 </section>
-<section id="inference-using-gls">
-<h1>Inference Using <code class="docutils literal notranslate"><span class="pre">gls()</span></code><a class="headerlink" href="#inference-using-gls" title="Link to this heading">#</a></h1>
-<section id="coefficient-tests">
-<h2>Coefficient Tests<a class="headerlink" href="#coefficient-tests" title="Link to this heading">#</a></h2>
-<p>… The key is understanding that the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function is designed to act <em>as if</em> we were using GLS instead of FGLS. So irrespective of whether we <em>give</em> <code class="docutils literal notranslate"><span class="pre">gls()</span></code> a covariance structure or <em>estimate</em> a covariance structure, the function will act the same way. This is <strong>Option 1a</strong> from earlier in the lesson: assume <span class="math notranslate nohighlight">\(\hat{\boldsymbol{\Sigma}} = \boldsymbol{\Sigma}\)</span> and <em>ignore</em> the problem entirely. Once we understand this, the behaviour of <code class="docutils literal notranslate"><span class="pre">gls()</span></code> makes complete sense.</p>
-</section>
-<section id="omnibus-tests">
-<h2>Omnibus Tests<a class="headerlink" href="#omnibus-tests" title="Link to this heading">#</a></h2>
-</section>
-<section id="follow-up-tests">
-<h2>Follow-up Tests<a class="headerlink" href="#follow-up-tests" title="Link to this heading">#</a></h2>
-</section>
-</section>
 <section id="viewing-the-complete-covariance-structure">
 <h1>Viewing the Complete Covariance Structure<a class="headerlink" href="#viewing-the-complete-covariance-structure" title="Link to this heading">#</a></h1>
-</section>
-<section id="the-gls-covariance-matrix">
-<h1>The GLS Covariance Matrix<a class="headerlink" href="#the-gls-covariance-matrix" title="Link to this heading">#</a></h1>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">)</span>
@@ -639,7 +635,7 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="n">Matrix</span><span class="p">)</span>
 
-<span class="n">gls_marginal_cov</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
+<span class="n">gls_full_cov</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="kr">function</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span><span class="w"> </span><span class="p">{</span>
 <span class="w">  </span><span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">nobs</span><span class="p">(</span><span class="n">fit</span><span class="p">)</span>
 
 <span class="w">  </span><span class="c1"># Correlation blocks (list) or single matrix if no grouping</span>
@@ -919,14 +915,7 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#visualising-the-model">Visualising the Model</a></li>
 </ul>
 </li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-using-gls">Inference Using <code class="docutils literal notranslate"><span class="pre">gls()</span></code></a><ul class="visible nav section-nav flex-column">
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#coefficient-tests">Coefficient Tests</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#omnibus-tests">Omnibus Tests</a></li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#follow-up-tests">Follow-up Tests</a></li>
-</ul>
-</li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#viewing-the-complete-covariance-structure">Viewing the Complete Covariance Structure</a></li>
-<li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#the-gls-covariance-matrix">The GLS Covariance Matrix</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#try-setting-correlation-to-1-what-happens">Try Setting Correlation to 1. What happens?</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#univariate-conceptualisation">Univariate Conceptualisation</a></li>
 <li class="toc-h1 nav-item toc-entry"><a class="reference internal nav-link" href="#multivariate-normal-distribution-with-2-conditions">Multivariate Normal Distribution with &gt; 2 Conditions</a></li>
