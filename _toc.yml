@@ -8,5 +8,4 @@ chapters:
 - file: 2.covariance-solutions
 - file: 3.gls
 - file: 4.gls-R
-- file: 5.gls-limitations
 - file: summary

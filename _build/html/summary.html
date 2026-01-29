@@ -87,7 +87,7 @@
     <script src="_static/sphericity_3d_files/CanvasMatrix4-1.3.18/CanvasMatrix.src.js?v=5a2d04be"></script>
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="prev" title="Limitations of the GLS Framework" href="5.gls-limitations.html" />
+    <link rel="prev" title="Using GLS in R" href="4.gls-R.html" />
   <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <meta name="docsearch:language" content="en"/>
   <meta name="docsearch:version" content="" />
@@ -196,7 +196,6 @@
 <li class="toctree-l1"><a class="reference internal" href="2.covariance-solutions.html">Solutions for Inference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="3.gls.html">Generalised Least Squares (GLS)</a></li>
 <li class="toctree-l1"><a class="reference internal" href="4.gls-R.html">Using GLS in <code class="docutils literal notranslate"><span class="pre">R</span></code></a></li>
-<li class="toctree-l1"><a class="reference internal" href="5.gls-limitations.html">Limitations of the GLS Framework</a></li>
 <li class="toctree-l1 current active"><a class="current reference internal" href="#">Summary</a></li>
 </ul>
 
@@ -367,7 +366,9 @@
 <button class="btn btn-sm pst-navbar-icon search-button search-button__button pst-js-only" title="Search" aria-label="Search" data-bs-placement="bottom" data-bs-toggle="tooltip">
     <i class="fa-solid fa-magnifying-glass fa-lg"></i>
 </button>
-
+<button class="sidebar-toggle secondary-toggle btn btn-sm" title="Toggle secondary sidebar" data-bs-placement="bottom" data-bs-toggle="tooltip">
+    <span class="fa-solid fa-list"></span>
+</button>
 </div></div>
       
     </div>
@@ -383,6 +384,16 @@
     <div id="print-main-content">
         <div id="jb-print-toc">
             
+            <div>
+                <h2> Contents </h2>
+            </div>
+            <nav aria-label="Page">
+                <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-limitations">Practical Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-limitations">Conceptual Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-we-use-gls">When Should We Use GLS?</a></li>
+</ul>
+            </nav>
         </div>
     </div>
 </div>
@@ -394,6 +405,34 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="summary">
 <h1>Summary<a class="headerlink" href="#summary" title="Link to this heading">#</a></h1>
+<p>We have spent a lot of time in this lesson discussing GLS. Although you may be wondering <em>why</em>, given that this unit is about <em>mixed-effects</em>, focusing on GLS to begin with has several advantages:</p>
+<ul class="simple">
+<li><p>Many problems you encounter in practice may be more simply addressed by using GLS, rather than a full mixed-effects approach.</p></li>
+<li><p>GLS very directly solves our main issues with the traditional repeated measures ANOVA, and so is the logical <em>next step</em> away from those methods.</p></li>
+<li><p>GLS makes us focus on the idea of the <em>covariance structure</em>, which will be helpful when understanding mixed-effects.</p></li>
+<li><p>In terms of implementation, the syntax used by <code class="docutils literal notranslate"><span class="pre">gls()</span></code> for describing the covariance structure will be repurposed in the context of mixed-effects. So understanding it now will be helpful.</p></li>
+<li><p>Mixed-effects models can be understood as a <em>form</em> of GLS, so conceptually GLS is helpful as a starting point.</p></li>
+<li><p>The issues around inference are not <em>unique</em> to GLS, as they are also shared by mixed-effects models. So understanding these problems <em>from the start</em> will prevent confusion later.</p></li>
+</ul>
+<p>However, as we have seen, there are some <em>problems</em> with using GLS. Some of these problems are <em>practical limitations</em> based on how GLS is implemented in <code class="docutils literal notranslate"><span class="pre">R</span></code>. These types of problems are potentially <em>fixable</em> in software, but are not presently implemented. Alternatively, some of these problems are <em>conceptual</em> and apply irrespective of any specific implementation in software.</p>
+<p>In terms of justifying the move to <em>mixed-effects</em>, the bigger issues are the <em>conceptual</em> ones. Although there may be a <em>practical</em> reason for moving to a different framework, this is not wholly convincing when the problem is a <em>software</em> one. Instead, we need to consider more fundamental <em>conceptual</em> limitations that justify a <em>more flexible</em> framework. So, the argument is <em>not</em> that mixed-effects models suddenly solve the problem of inference for arbitrary covariance structures (they very much <em>do not</em>, even if more options are available in software). The argument is that the whole <em>framework</em> of mixed-effects provides us with more sophisticated and flexible models that give us everything GLS does <em>and more</em>.</p>
+<section id="practical-limitations">
+<h2>Practical Limitations<a class="headerlink" href="#practical-limitations" title="Link to this heading">#</a></h2>
+<p>… So, note that these are not necessarily limitations of the <em>framework</em>, but they are limitations based on the <em>choices</em> made when GLS was implemented in <code class="docutils literal notranslate"><span class="pre">R</span></code>. Although someone could quite easily implement a different package that provides GLS functionality, the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function from <code class="docutils literal notranslate"><span class="pre">nlme</span></code> is so ubiquitous and so widely-supported by other packages (e.g. <code class="docutils literal notranslate"><span class="pre">car</span></code>, <code class="docutils literal notranslate"><span class="pre">emmeans</span></code>, <code class="docutils literal notranslate"><span class="pre">effects</span></code> etc.) that this would take time to gain traction and become practically useful. So, for now, it makes most sense to simply treat <code class="docutils literal notranslate"><span class="pre">gls()</span></code> as the only option.</p>
+</section>
+<section id="conceptual-limitations">
+<h2>Conceptual Limitations<a class="headerlink" href="#conceptual-limitations" title="Link to this heading">#</a></h2>
+<p>… Remember, that the correlation structure exists <em>as a consequence</em> of how the data is structured. The correlation is a <em>byproduct</em> of this structure. In GLS, we have treated the correlation as a <em>nuisance</em>. It is a separate element of the model that we simply want to get rid of. We just take a single covariance matrix and sweep it away using a big mathematical broom. But this is an <em>extreme</em> approach to the problem because it <em>ignores</em> the structure that caused the correlation in the first place. Instead, if our model somehow <em>embedded</em> that structure, the correlations would be accounted for <em>automatically</em> without any explicit declaration of the form of the variance-covariance matrix. Furthermore, the model could use that structure to <em>learn</em> about the data. Information could be pooled to provide much more subtle and nuanced predictions that understands the hierarchy under which the data were sampled. This is precisely what mixed-effects models are able to do. So far from solving the inferential problems of GLS, mixed-effects models actually provide a more sophisticated alternative that does not require us to focus on the covariance structure as an explicit element of the model. We simply express how the data are structured, and everything else is taken care of. This is not only more elegant, but also provides opportunity for much more complex dependency patterns that would be very difficult to use with GLS. So, the conceptual limitations of GLS are simply that it takes a <em>sledgehammer</em> to the problem of dependency. Mixed-effects models provide an alternative that is much more refined and is driven by a focus on <em>data structure</em>, rather than <em>covariance</em> structure. However, there are times where a sledgehammer is useful. The most important aspect going forward is to treat GLS <em>as an option</em> and not just dismiss it wholesale in favour of mixed-effects models.</p>
+</section>
+<section id="when-should-we-use-gls">
+<h2>When Should We Use GLS?<a class="headerlink" href="#when-should-we-use-gls" title="Link to this heading">#</a></h2>
+<p>So, taking everything we have discussed in this lesson, our final question is: when should we use GLS? Answering this is somewhat tricky when we have not covered mixed-effects as the alternative. However, even at this stage, we can provide recommendations around when GLS may be the <em>better</em> choice. Oftentimes, if you have a repeated measures or longitudinal dataset, you can start by <em>considering</em> GLS and then asking whether mixed-effects actually offers any advantages. If it does not, or if the additional complications that arise from a mixed-effects model do not seem worth it, then GLS is the obvious solution. So, we can conceptualise GLS as something of a <em>fall-back</em> position. However, this does the method something of a disservice as there are plenty of situations where GLS is the more obvious choice:</p>
+<ol class="arabic simple">
+<li><p>When …</p></li>
+<li><p>When …</p></li>
+</ol>
+<p>This decision making process will be made easier once we are more familiar with the mixed-effects framework and can make a direct comparison. However, if GLS already seems to do everything that you need for your dataset, there is no argument to be made for making things <em>more complex</em> for little in the way of gain. Although these days mixed-effects have become a <em>default position</em> for a lot of researchers, this may not always be the most sensible choice.</p>
+</section>
 </section>
 
     <script type="text/x-thebe-config">
@@ -427,12 +466,12 @@
                   
 <div class="prev-next-area">
     <a class="left-prev"
-       href="5.gls-limitations.html"
+       href="4.gls-R.html"
        title="previous page">
       <i class="fa-solid fa-angle-left"></i>
       <div class="prev-next-info">
         <p class="prev-next-subtitle">previous</p>
-        <p class="prev-next-title">Limitations of the GLS Framework</p>
+        <p class="prev-next-title">Using GLS in <code class="docutils literal notranslate"><span class="pre">R</span></code></p>
       </div>
     </a>
 </div>
@@ -441,6 +480,24 @@
             </div>
             
             
+              
+                <dialog id="pst-secondary-sidebar-modal"></dialog>
+                <div id="pst-secondary-sidebar" class="bd-sidebar-secondary bd-toc"><div class="sidebar-secondary-items sidebar-secondary__inner">
+
+
+  <div class="sidebar-secondary-item">
+  <div class="page-toc tocsection onthispage">
+    <i class="fa-solid fa-list"></i> Contents
+  </div>
+  <nav class="bd-toc-nav page-toc">
+    <ul class="visible nav section-nav flex-column">
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#practical-limitations">Practical Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#conceptual-limitations">Conceptual Limitations</a></li>
+<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#when-should-we-use-gls">When Should We Use GLS?</a></li>
+</ul>
+  </nav></div>
+
+</div></div>
               
             
           </div>
