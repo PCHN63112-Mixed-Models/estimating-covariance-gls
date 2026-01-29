@@ -743,12 +743,12 @@ Degrees of freedom: 30 total; 27 residual
 </div>
 </div>
 </div>
-<p>where we now have a table of coefficients, similar in spirit to those from an <code class="docutils literal notranslate"><span class="pre">lm()</span></code> model. However, notice that these are given as <span class="math notranslate nohighlight">\(t\)</span>-statistics <em>not</em> <span class="math notranslate nohighlight">\(z\)</span>-statistics. So this is <em>not</em> asymptotic inference (solution <strong>1b</strong> from earlier). In addition, notice that the <code class="docutils literal notranslate"><span class="pre">Degrees</span> <span class="pre">of</span> <span class="pre">freedom</span></code> listed at the bottom are calculated as the <em>total</em> amount of data (<span class="math notranslate nohighlight">\(n \times t = 10 \times 3 = 30\)</span>) minus the 3 parameters for the mean function. So, this is <em>not</em> using effective degrees of freedom (solution <strong>2</strong> from earlier) because the 6 parameters used to estimate the covariance structure are being <em>ignored</em>. So, what <code class="docutils literal notranslate"><span class="pre">summary()</span></code> is doing here is solution <strong>1a</strong>: treating <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> as <em>known</em> and ignoring everything else.</p>
-<p>The key to understanding <em>why</em> <code class="docutils literal notranslate"><span class="pre">summary()</span></code> behaves in this way is that the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function is designed to act <em>as if</em> we were using GLS instead of FGLS. Indeed, all of the <code class="docutils literal notranslate"><span class="pre">weights=</span></code> and <code class="docutils literal notranslate"><span class="pre">correlation=</span></code> functions will take values for the parameters so that <em>pre-specified</em> structures can be used in the call to <code class="docutils literal notranslate"><span class="pre">gls()</span></code>. This was the <em>original intent</em> of the function. The ability to <em>estimate</em> the structure from the data (and thus switch to FGLS) was a <em>practical</em> inclusion, but not one that <code class="docutils literal notranslate"><span class="pre">summary()</span></code> adjusts for. Once we understand this, the behaviour of <code class="docutils literal notranslate"><span class="pre">gls()</span></code> makes complete sense. However, we need to be mindful of all the consequences of this, as listed earlier in the lesson.</p>
+<p>where we now have a table of coefficients, similar in spirit to those from an <code class="docutils literal notranslate"><span class="pre">lm()</span></code> model<a class="footnote-reference brackets" href="#glsp-foot" id="id3" role="doc-noteref"><span class="fn-bracket">[</span>3<span class="fn-bracket">]</span></a>. However, notice that these are given as <span class="math notranslate nohighlight">\(t\)</span>-statistics <em>not</em> <span class="math notranslate nohighlight">\(z\)</span>-statistics. So this is <em>not</em> asymptotic inference (solution <strong>1b</strong> from earlier). In addition, notice that the <code class="docutils literal notranslate"><span class="pre">Degrees</span> <span class="pre">of</span> <span class="pre">freedom</span></code> listed at the bottom are calculated as the <em>total</em> amount of data (<span class="math notranslate nohighlight">\(n \times t = 10 \times 3 = 30\)</span>) minus the 3 parameters for the mean function. So, this is <em>not</em> using effective degrees of freedom (solution <strong>2</strong> from earlier) because the 6 parameters used to estimate the covariance structure are being <em>ignored</em>. So, what <code class="docutils literal notranslate"><span class="pre">summary()</span></code> is doing here is solution <strong>1a</strong>: treating <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> as <em>known</em> and ignoring everything else.</p>
+<p>The key to understanding <em>why</em> <code class="docutils literal notranslate"><span class="pre">summary()</span></code> behaves in this way is that the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function is designed to act <em>as if</em> we were using GLS instead of FGLS. Indeed, all of the <code class="docutils literal notranslate"><span class="pre">weights=</span></code> and <code class="docutils literal notranslate"><span class="pre">correlation=</span></code> functions will take values for the parameters so that <em>pre-specified</em> structures can be used in the call to <code class="docutils literal notranslate"><span class="pre">gls()</span></code>. This was the <em>original intent</em> of the function. The ability to <em>estimate</em> the structure from the data (and thus switch to FGLS) was a <em>practical</em> inclusion, but not one that <code class="docutils literal notranslate"><span class="pre">summary()</span></code> adjusts for. Once we understand this, the behaviour of <code class="docutils literal notranslate"><span class="pre">gls()</span></code> makes complete sense. However, we need to be mindful of all the consequences of this, as listed earlier in the lesson. For our purposes, the main issue is that the uncertainty in the estimation of <span class="math notranslate nohighlight">\(\boldsymbol{\Sigma}\)</span> is being <em>ignored</em>, so the degrees of freedom will not match the traditional repeated measures ANOVA and the <span class="math notranslate nohighlight">\(p\)</span>-values will be <em>too small</em>.</p>
 </section>
 <section id="omnibus-tests">
 <h3>Omnibus Tests<a class="headerlink" href="#omnibus-tests" title="Link to this heading">#</a></h3>
-<p>Although the tests returned by <code class="docutils literal notranslate"><span class="pre">summary()</span></code> are somewhat problematic, the extent to which this matters depends on our intention for the model. As we know from last semester, under a typical ANOVA scheme the individual coefficients tests are not particularly interesting because they depend upon the type of dummy variable scheme used. As such, we tend to rely on <em>omnibus</em> tests with specific <em>follow-up</em> tests instead. So, for the one-way ANOVA model with an unconstrained covariance structure, we can again turn to <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> from the <code class="docutils literal notranslate"><span class="pre">car</span></code> package to produce our Type II omnibus ANOVA tests.</p>
+<p>Although the tests returned by <code class="docutils literal notranslate"><span class="pre">summary()</span></code> are somewhat problematic, the extent to which this matters depends on our intention for the model. As we know from last semester, under a typical ANOVA approach, the individual coefficients tests are not particularly interesting because they depend upon the type of dummy variable scheme used. As such, we tend to rely on <em>omnibus</em> tests with specific <em>follow-up</em> tests instead. So, for the one-way ANOVA model with an unconstrained covariance structure, we would probably <em>ignore</em> the tests from <code class="docutils literal notranslate"><span class="pre">summary()</span></code> anyway and just use <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> from the <code class="docutils literal notranslate"><span class="pre">car</span></code> package to produce our Type II omnibus tests.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;car&#39;</span><span class="p">)</span>
@@ -768,10 +768,84 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 </div>
 </div>
 </div>
-<p>Notice, however, that this does <em>not</em> provide an <span class="math notranslate nohighlight">\(F\)</span>-statistic with denominator degrees of freedom, so this is neither solution <strong>1a</strong> nor solution <strong>2</strong> from earlier. Instead, <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> relies on <em>asymptotic</em> tests for omnibus inference. So, interpreting this test involves accepting that the <span class="math notranslate nohighlight">\(p\)</span>-value will only be <em>asymptotically</em> correct, getting more accurate the larger the sample becomes. In this example, we only have <span class="math notranslate nohighlight">\(n = 10\)</span>, which should make us very cautious about interpreting this test. However, the <span class="math notranslate nohighlight">\(p\)</span>-value is <em>so small</em> (<span class="math notranslate nohighlight">\(p &lt; 0.00000000000000022\)</span>) that even if it were <em>liberal</em> under small samples, it would have to be <em>catastrophically liberal</em> in order for a <em>non-significant</em> effect to be <em>this significant</em> due to sample size alone. In this case, we probably feel fairly confident that <em>something</em> is going on, even under asymptotic assumptions.</p>
+<p>Notice, however, that this does <em>not</em> provide an <span class="math notranslate nohighlight">\(F\)</span>-statistic with denominator degrees of freedom, so this is neither solution <strong>1a</strong> nor solution <strong>2</strong> from earlier. Instead, <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> relies on <em>asymptotic</em> tests for omnibus inference. The <span class="math notranslate nohighlight">\(\chi^{2}\)</span> statistic given here is similar in form to the <span class="math notranslate nohighlight">\(F\)</span>-statistic, but does not scale the variance of the parameter estimates by the error degrees of freedom. In other words, it treats this as a <em>known constant</em>. So, interpreting this test involves accepting that the <span class="math notranslate nohighlight">\(p\)</span>-value will only be <em>asymptotically</em> correct, getting more accurate the larger the sample becomes, as our estimate of the covariance structure gets closer to the true value. In this example, we only have <span class="math notranslate nohighlight">\(n = 10\)</span>, which should make us <em>very cautious</em> about interpreting this test. However, the <span class="math notranslate nohighlight">\(p\)</span>-value is <em>so small</em> (<span class="math notranslate nohighlight">\(p &lt; 0.00000000000000022\)</span>) that even if it were <em>liberal</em> under small samples, it would have to be <em>catastrophically liberal</em> in order for a <em>non-significant</em> effect to be <em>this significant</em> due to sample size alone. In this case, we probably feel fairly confident that <em>something</em> is going on, even using tests that are only asymptotically valid.</p>
 </section>
 <section id="follow-up-tests">
 <h3>Follow-up Tests<a class="headerlink" href="#follow-up-tests" title="Link to this heading">#</a></h3>
+<p>As a final step in our usual analysis pipeline, we would follow-up the omnibus ANOVA tests with some individual paired comparisons. Although we <em>could</em> fall-back on the coefficient tests from <code class="docutils literal notranslate"><span class="pre">summary()</span></code>, we saw last semester that this is problematic. Under <code class="docutils literal notranslate"><span class="pre">gls()</span></code>, the same problems occur and we now have some additional problems as well. So, instead, we will again turn to the <code class="docutils literal notranslate"><span class="pre">emmeans</span></code> package for a practical solution.</p>
+<p>For our one-way ANOVA with an unconstrained covariance structure, we can produce pairwise tests of the levels of <code class="docutils literal notranslate"><span class="pre">time</span></code> by using</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;emmeans&#39;</span><span class="p">)</span>
+<span class="n">emm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">emmeans</span><span class="p">(</span><span class="n">gls.mod.UC</span><span class="p">,</span><span class="w"> </span><span class="n">pairwise</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="o">=</span><span class="s">&#39;asymptotic&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">adjust</span><span class="o">=</span><span class="s">&#39;holm&#39;</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">emm</span><span class="o">$</span><span class="n">contrasts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> contrast estimate    SE  df z.ratio p.value
+ t1 - t2     -1.79 0.361 Inf  -4.968  &lt;.0001
+ t1 - t3     -4.50 0.340 Inf -13.228  &lt;.0001
+ t2 - t3     -2.70 0.555 Inf  -4.868  &lt;.0001
+
+Degrees-of-freedom method: asymptotic 
+P value adjustment: holm method for 3 tests 
+</pre></div>
+</div>
+</div>
+</div>
+<p>The key argument here is <code class="docutils literal notranslate"><span class="pre">mode=</span></code>. This is where we can tell <code class="docutils literal notranslate"><span class="pre">emmeans</span></code> how to deal with the degrees of freedom of the tests. In the above example, we have used <code class="docutils literal notranslate"><span class="pre">mode='asymptotic'</span></code>, so <code class="docutils literal notranslate"><span class="pre">emmeans</span></code> produces <span class="math notranslate nohighlight">\(z\)</span>-statistics and associated <span class="math notranslate nohighlight">\(p\)</span>-values. This allows the results from <code class="docutils literal notranslate"><span class="pre">emmeans</span></code> to be <em>inferentially consistent</em> with the asymptotic omnibus tests produced by <code class="docutils literal notranslate"><span class="pre">Anova()</span></code>. So, we have a framework where we can use a consistent <em>asymptotic</em> solution for inference using <code class="docutils literal notranslate"><span class="pre">gls()</span></code>. Indeed, we <em>can</em> apply this to the results of <code class="docutils literal notranslate"><span class="pre">summary()</span></code>. All we need to do is <em>not</em> treat the values in the <code class="docutils literal notranslate"><span class="pre">t-value</span></code> column as <em>actual</em> <span class="math notranslate nohighlight">\(t\)</span>-statistics. Instead, treat them as <span class="math notranslate nohighlight">\(z\)</span>-statistics and calculate their <span class="math notranslate nohighlight">\(p\)</span>-values manually using a standard normal distribution<a class="footnote-reference brackets" href="#normalp-foot" id="id4" role="doc-noteref"><span class="fn-bracket">[</span>4<span class="fn-bracket">]</span></a>.</p>
+<p>As an aside, whilst <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> has no other options available for taking a different inferential approach, <code class="docutils literal notranslate"><span class="pre">emmeans</span></code> does. So we could <em>also</em> produce results consistent with <em>ignoring</em> the problem</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">emm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">emmeans</span><span class="p">(</span><span class="n">gls.mod.UC</span><span class="p">,</span><span class="w"> </span><span class="n">pairwise</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="o">=</span><span class="s">&#39;df.error&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">adjust</span><span class="o">=</span><span class="s">&#39;holm&#39;</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">emm</span><span class="o">$</span><span class="n">contrasts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span> contrast estimate    SE df t.ratio p.value
+ t1 - t2     -1.79 0.361 22  -4.968  0.0001
+ t1 - t3     -4.50 0.340 22 -13.228  &lt;.0001
+ t2 - t3     -2.70 0.555 22  -4.868  0.0001
+
+Degrees-of-freedom method: df.error 
+P value adjustment: holm method for 3 tests 
+</pre></div>
+</div>
+</div>
+</div>
+<p>and results using <em>effective degrees of freedom</em>, which relies on a method known as <em>Satterwaithe</em> degrees of freedom.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">emm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">emmeans</span><span class="p">(</span><span class="n">gls.mod.UC</span><span class="p">,</span><span class="w"> </span><span class="n">pairwise</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="o">=</span><span class="s">&#39;satterthwaite&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">adjust</span><span class="o">=</span><span class="s">&#39;holm&#39;</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">emm</span><span class="o">$</span><span class="n">contrasts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Analytical Satterthwaite method not available; using appx-satterthwaite
+ contrast estimate    SE   df t.ratio p.value
+ t1 - t2     -1.79 0.361 9.07  -4.968  0.0015
+ t1 - t3     -4.50 0.340 9.07 -13.228  &lt;.0001
+ t2 - t3     -2.70 0.555 9.01  -4.868  0.0015
+
+Degrees-of-freedom method: appx-satterthwaite 
+P value adjustment: holm method for 3 tests 
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that both these alternative methods have produced <em>more conservative</em> results, given the small number of subjects in this example. However, use of either of these alternatives creates an <em>inconsistent</em> inferential framework, given that <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> only has asymptotic tests available. So we either have to stick to a <em>single</em> framework for consistency, or try to justify <em>inconsistency</em> across our tests. This is the unfortunate <em>practical</em> situation we find ourselves in.</p>
+<aside class="topic">
+<p class="topic-title">What do you now know?</p>
+<p>In this section, we have explored … . After reading this section, you should have a good sense of :</p>
+<ul class="simple">
+<li><p>…</p></li>
+<li><p>…</p></li>
+<li><p>…</p></li>
+</ul>
+</aside>
 <hr class="footnotes docutils" />
 <aside class="footnote-list brackets">
 <aside class="footnote brackets" id="imagefunc-foot" role="note">
@@ -781,6 +855,14 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 <aside class="footnote brackets" id="reps-foot" role="note">
 <span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id2">2</a><span class="fn-bracket">]</span></span>
 <p>This is an unusual situation in psychological experiments, not because replications do not exists (they almost always do) but because psychologists will usually just average-over them as part of the pre-processing of their data. This is a habit that comes <em>directly</em> from needing data that fits with the traditional repeated measures ANOVA. However, this is not only unnecessary with modern methods, but is actively <em>throwing away</em> information that the model can use. This is perhaps <em>less important</em> with GLS, but is potentially <em>very important</em> with mixed-effects.</p>
+</aside>
+<aside class="footnote brackets" id="glsp-foot" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id3">3</a><span class="fn-bracket">]</span></span>
+<p>Notice that the <span class="math notranslate nohighlight">\(p\)</span>-values have been <em>rounded</em> here, rather than given in scientific notation. So these are not <em>literally</em> 0, they are just so small that they have been rounded to 0. Whenever the <code class="docutils literal notranslate"><span class="pre">summary()</span></code> table for <code class="docutils literal notranslate"><span class="pre">gls()</span></code> shows <code class="docutils literal notranslate"><span class="pre">0</span></code>, just take it to mean <span class="math notranslate nohighlight">\(p &lt; 0.001\)</span>.</p>
+</aside>
+<aside class="footnote brackets" id="normalp-foot" role="note">
+<span class="label"><span class="fn-bracket">[</span><a role="doc-backlink" href="#id4">4</a><span class="fn-bracket">]</span></span>
+<p>For example, we could take <span class="math notranslate nohighlight">\(t = 4.967618\)</span> and treat it as <span class="math notranslate nohighlight">\(z = 4.967618\)</span>. Its <span class="math notranslate nohighlight">\(p\)</span>-value can then be calculated using <code class="docutils literal notranslate"><span class="pre">2*pnorm(q=4.967618,</span> <span class="pre">lower.tail=FALSE)</span></code>. In general, if we take <code class="docutils literal notranslate"><span class="pre">z</span> <span class="pre">&lt;-</span> <span class="pre">t</span></code>, we can use <code class="docutils literal notranslate"><span class="pre">2*pnorm(q=abs(z),</span> <span class="pre">lower.tail=FALSE)</span></code> for inference.</p>
 </aside>
 </aside>
 </section>
