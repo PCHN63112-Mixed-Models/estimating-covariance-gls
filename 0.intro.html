@@ -408,7 +408,7 @@
                   
   <section class="tex2jax_ignore mathjax_ignore" id="introduction">
 <h1>Introduction<a class="headerlink" href="#introduction" title="Link to this heading">#</a></h1>
-<p>… In this lesson…</p>
+<p>Last week, we saw how to model repeated measurements probabilistically using the <em>multivariate</em> normal distribution. Key to this, was the specification of the <em>variance-covariance matrix</em>, which captures the pattern of correlation across the repeated measurements. We also saw that one of the problems with the repeated measures ANOVA was that it assumed a very restrictive covariance structure in the form of <em>compound symmetry</em>. This had direct consequences for inference because the covariance structure directly informs the standard errors and thus the denominator of the tests statistics, <span class="math notranslate nohighlight">\(p\)</span>-values and confidence intervals. As such, our concern around modelling repeated measures corresponds directly to the use of a suitable covariance structure to represent the data-generating process. In an ideal world, what we want is a method that makes <em>no</em> assumptions about the covariance structure and just allows it to be estimated from the data. Unfortunately, this desire has consequences for inference. In short, the condition of compound symmetry is imposed for the repeated measures ANOVA <em>precisely</em> because that is the one situation where inference still works. As soon as we move away from this to an <em>arbitrary covariance structure</em>, the inferential machinery <em>falls apart</em>. In this lesson, we will begin by focusing on this issue, because it has direct consequences for all the methods we will cover going forward. We will then discuss GLS as one potential approach that allows for a more general covariance structure, again focusing on how inference can be conducted under these conditions. This will pave the way for understanding the full mixed-effects framework, which will be our focus <em>next week</em>.</p>
 <section id="contents">
 <h2>Contents<a class="headerlink" href="#contents" title="Link to this heading">#</a></h2>
 <div class="toctree-wrapper compound">
@@ -427,7 +427,7 @@
 <a class="reference internal image-reference" href="_images/martyn.jpeg"><img alt="_images/martyn.jpeg" src="_images/martyn.jpeg" style="width: 185.7px; height: 223.04999999999998px;" /></a>
 </figure>
 <p><strong>Dr Martyn McFarquhar | PhD FHEA</strong></p>
-<p>Lecturer in Neuroimaging</p>
+<p>Lecturer and Co-director of the Joint MRes Programmes in Psychology</p>
 <p>4.33 Booth Street East | Division of Psychology, Communication and Human Neuroscience | School of Health Sciences | The University of Manchester M13 9PL</p>
 <p>t: +44 (0)161 275 2688 | e: <a class="reference external" href="mailto:martyn&#46;mcfarquhar&#37;&#52;&#48;manchester&#46;ac&#46;uk">martyn<span>&#46;</span>mcfarquhar<span>&#64;</span>manchester<span>&#46;</span>ac<span>&#46;</span>uk</a></p>
 </section>
