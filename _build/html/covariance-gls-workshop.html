@@ -421,6 +421,111 @@
 <h2>Applying to GLS to More Complex ANOVA Models<a class="headerlink" href="#applying-to-gls-to-more-complex-anova-models" title="Link to this heading">#</a></h2>
 <section id="between-subjects-factors">
 <h3>Between-subjects Factors<a class="headerlink" href="#between-subjects-factors" title="Link to this heading">#</a></h3>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;datarium&#39;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="s">&#39;reshape2&#39;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="s">&#39;nlme&#39;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="s">&#39;car&#39;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="s">&#39;effects&#39;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="s">&#39;emmeans&#39;</span><span class="p">)</span>
+
+<span class="nf">data</span><span class="p">(</span><span class="s">&#39;anxiety&#39;</span><span class="p">)</span>
+
+<span class="c1"># repeats and number of subjects</span>
+<span class="n">t</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">3</span>
+<span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">45</span>
+
+<span class="c1"># reshape wide -&gt; long</span>
+<span class="n">anxiety.long</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">melt</span><span class="p">(</span><span class="n">anxiety</span><span class="p">,</span><span class="w">                 </span><span class="c1"># wide data frame</span>
+<span class="w">                     </span><span class="n">id.vars</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span><span class="s">&#39;group&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1"># both id and group stay fixed?</span>
+<span class="w">                     </span><span class="n">variable.name</span><span class="o">=</span><span class="s">&#39;time&#39;</span><span class="p">,</span><span class="w">    </span><span class="c1"># name for the new predictor</span>
+<span class="w">                     </span><span class="n">value.name</span><span class="o">=</span><span class="s">&#39;score&#39;</span><span class="p">)</span><span class="w">      </span><span class="c1"># name for the new outcome</span>
+
+<span class="n">anxiety.long</span><span class="w">           </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">anxiety.long</span><span class="w"> </span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">id</span><span class="p">),]</span><span class="w"> </span><span class="c1"># order by ID</span>
+<span class="nf">rownames</span><span class="p">(</span><span class="n">anxiety.long</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="n">n</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="w">                             </span><span class="c1"># fix row names</span>
+<span class="n">anxiety.long</span><span class="o">$</span><span class="n">id</span><span class="w">        </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">id</span><span class="p">)</span><span class="w">             </span><span class="c1"># id as factor</span>
+<span class="n">anxiety.long</span><span class="o">$</span><span class="n">group</span><span class="w">     </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">group</span><span class="p">)</span><span class="w">          </span><span class="c1"># group as factor</span>
+<span class="n">anxiety.long</span><span class="o">$</span><span class="n">time</span><span class="w">      </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">time</span><span class="p">)</span><span class="w">           </span><span class="c1"># time as factor</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">anxiety.gls</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">group</span><span class="o">*</span><span class="n">time</span><span class="p">,</span><span class="w"> </span>
+<span class="w">                   </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span>
+<span class="w">                   </span><span class="n">weights</span><span class="o">=</span><span class="nf">varIdent</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">group</span><span class="p">),</span><span class="w"> </span>
+<span class="w">                   </span><span class="n">data</span><span class="o">=</span><span class="n">anxiety.long</span><span class="p">)</span>
+
+<span class="nf">print</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Generalized least squares fit by REML
+  Model: score ~ group * time 
+  Data: anxiety.long 
+  Log-restricted-likelihood: -125.3603
+
+Coefficients:
+     (Intercept)        groupgrp2        groupgrp3           timet2 
+     17.08666667      -0.44000000      -0.07333333      -0.16000000 
+          timet3 groupgrp2:timet2 groupgrp3:timet2 groupgrp2:timet3 
+     -0.58000000      -0.02000000      -1.84000000      -0.54000000 
+groupgrp3:timet3 
+     -2.87333333 
+
+Correlation Structure: General
+ Formula: ~1 | id 
+ Parameter estimate(s):
+ Correlation: 
+  1     2    
+2 0.972      
+3 0.952 0.970
+Variance function:
+ Structure: Different standard deviations per stratum
+ Formula: ~1 | group 
+ Parameter estimates:
+     grp1      grp2      grp3 
+1.0000000 0.9631245 0.9783267 
+Degrees of freedom: 135 total; 126 residual
+Residual standard error: 1.579195 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">Anova</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Analysis of Deviance Table (Type II tests)
+
+Response: score
+           Df    Chisq Pr(&gt;Chisq)    
+group       2   7.8821    0.01943 *  
+time        2 582.1206    &lt; 2e-16 ***
+group:time  4 346.1442    &lt; 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+</pre></div>
+</div>
+</div>
+</div>
+<p>Notice that this does not require specification of a different error term for <code class="docutils literal notranslate"><span class="pre">group</span></code>, as the traditional repeated measures ANOVA would. Instead, the correct denominator is extracted from the variance-covariance matrix. So there is no need to even think about whether the test statistics are using the correct partition of error variance, the model takes care of this <em>automatically</em>.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">plot</span><span class="p">(</span><span class="nf">effect</span><span class="p">(</span><span class="s">&#39;group:time&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">mod</span><span class="o">=</span><span class="n">anxiety.gls</span><span class="p">,</span><span class="w"> </span><span class="n">residuals</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<img alt="_images/82f6e889697023ba616dc472d04e380f6f68e160eb471d98705541bad6897f8c.png" src="_images/82f6e889697023ba616dc472d04e380f6f68e160eb471d98705541bad6897f8c.png" />
+</div>
+</div>
 </section>
 <section id="multiple-within-subject-factors">
 <h3>Multiple Within-subject Factors<a class="headerlink" href="#multiple-within-subject-factors" title="Link to this heading">#</a></h3>
@@ -441,31 +546,25 @@
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Marginal variance covariance matrix
-          [,1]      [,2]     [,3]
-[1,]  0.327720 -0.073454 -0.10269
-[2,] -0.073454  0.682240 -0.14817
-[3,] -0.102690 -0.148170  1.33340
-  Standard Deviations: 0.57247 0.82598 1.1548 
+<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="ne">Error</span>:
+
+<span class="o">!</span><span class="w"> </span>object<span class="w"> </span><span class="s1">&#39;selfesteem.long&#39;</span><span class="w"> </span>not<span class="w"> </span>found
+
+    <span class="err">▆</span>
+
+<span class="g g-Whitespace"> </span><span class="mi">1</span><span class="o">.</span> <span class="err">└─</span><span class="n">nlme</span><span class="p">::</span><span class="n">gls</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+
+<span class="g g-Whitespace"> </span><span class="mi">2</span><span class="o">.</span>   <span class="err">├─</span><span class="n">stats</span><span class="p">::</span><span class="n">terms</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
+
+<span class="g g-Whitespace"> </span><span class="mi">3</span><span class="o">.</span>   <span class="err">└─</span><span class="n">stats</span><span class="p">::</span><span class="n">terms</span><span class="o">.</span><span class="n">formula</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
 </pre></div>
 </div>
-<img alt="_images/413187a380ac10cc0cbf4efcff8fc4491426098ee245e634e4414627382e61e8.png" src="_images/413187a380ac10cc0cbf4efcff8fc4491426098ee245e634e4414627382e61e8.png" />
 </div>
 </div>
 <p>So, here we can see that we have created a variance-covariance matrix where <em>both</em> the diagonal and off-diagonal elements are not different. However, this has been achieved using only a <em>single</em> correlation parameter. So, in reality, the correlation between the repeated measurements remains <em>fixed</em>. We can see this by converting the variance-covariance matrix into a correlation matrix, using the <code class="docutils literal notranslate"><span class="pre">cov2cor()</span></code> function</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">cov2cor</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Marginal variance covariance matrix
-         [,1]     [,2]     [,3]
-[1,]  1.00000 -0.15534 -0.15534
-[2,] -0.15534  1.00000 -0.15534
-[3,] -0.15534 -0.15534  1.00000
-  Standard Deviations: 1 1 1 
 </pre></div>
 </div>
 </div>
@@ -482,17 +581,6 @@
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Marginal variance covariance matrix
-         [,1]     [,2]     [,3]
-[1,]  0.76920 -0.23823  0.21441
-[2,] -0.23823  0.76920 -0.33831
-[3,]  0.21441 -0.33831  0.76920
-  Standard Deviations: 0.87704 0.87704 0.87704 
-</pre></div>
-</div>
-<img alt="_images/6e2adbcdcbc44d82369f0bfb4bad9927c683c7886f199e9968870db7c7939967.png" src="_images/6e2adbcdcbc44d82369f0bfb4bad9927c683c7886f199e9968870db7c7939967.png" />
-</div>
 </div>
 <p>This time, we have kept the variances <em>fixed</em> but have allowed the <em>correlation</em> to change between the repeated measurements.</p>
 <div class="cell docutils container">
@@ -504,16 +592,6 @@
 <span class="nf">image</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>3 x 3 Matrix of class &quot;dsyMatrix&quot;
-           [,1]       [,2]       [,3]
-[1,]  0.3044901 -0.1272857  0.2273559
-[2,] -0.1272857  0.7448897 -0.5157849
-[3,]  0.2273559 -0.5157849  1.3055278
-</pre></div>
-</div>
-<img alt="_images/49a2b35fcc89cecc212ebc42f88f319b4830332f6e4c50f59523cb1158a81cbf.png" src="_images/49a2b35fcc89cecc212ebc42f88f319b4830332f6e4c50f59523cb1158a81cbf.png" />
 </div>
 </div>
 </section>
@@ -527,15 +605,6 @@
 <span class="n">gls.mod.4</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="w">    </span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">weights</span><span class="o">=</span><span class="nf">varIdent</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">time</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">selfesteem.long</span><span class="p">,</span><span class="w"> </span><span class="n">method</span><span class="o">=</span><span class="s">&#39;ML&#39;</span><span class="p">)</span><span class="w"> </span><span class="c1"># general symmetric + heterogeneity of variance</span>
 
 <span class="nf">anova</span><span class="p">(</span><span class="n">gls.mod.1</span><span class="p">,</span><span class="w"> </span><span class="n">gls.mod.2</span><span class="p">,</span><span class="w"> </span><span class="n">gls.mod.3</span><span class="p">,</span><span class="w"> </span><span class="n">gls.mod.4</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>          Model df      AIC      BIC    logLik   Test  L.Ratio p-value
-gls.mod.1     1  5 83.60855 90.61453 -36.80427                        
-gls.mod.2     2  7 83.04092 92.84930 -34.52046 1 vs 2 4.567627  0.1019
-gls.mod.3     3  7 84.66271 94.47109 -35.33136                        
-gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 </pre></div>
 </div>
 </div>
@@ -595,9 +664,6 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 </pre></div>
 </div>
 </div>
-<div class="cell_output docutils container">
-<img alt="_images/81c38fad274650ad532deb20fd69831c1a31b9be6f7dc4b12f9c51aa2eabac41.png" src="_images/81c38fad274650ad532deb20fd69831c1a31b9be6f7dc4b12f9c51aa2eabac41.png" />
-</div>
 </div>
 <p>As way of comparison, the model with the compound symmetric structure gives</p>
 <div class="cell docutils container">
@@ -605,9 +671,6 @@ gls.mod.4     4  9 83.11777 95.72855 -32.55888 3 vs 4 5.544944  0.0625
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">plot.gls</span><span class="p">(</span><span class="n">gls.mod.CompSymm</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="cell_output docutils container">
-<img alt="_images/ef8bd934cab9250380d47993b09596d7efb8f2649e4891f1382b210d26880673.png" src="_images/ef8bd934cab9250380d47993b09596d7efb8f2649e4891f1382b210d26880673.png" />
 </div>
 </div>
 <p>which does appear qualitatively <em>worse</em>, thus suggesting that a more complex covariance structure provides a better model fit.</p>
