@@ -8,7 +8,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="generator" content="Docutils 0.18.1: http://docutils.sourceforge.net/" />
 
-    <title>Covariance Structures and GLS: Workshop &#8212; Estimating Covariance Structures and Generalised Least Squares</title>
+    <title>PCHN63112 Workshop: Covariance Structures and GLS &#8212; Estimating Covariance Structures and Generalised Least Squares</title>
   
   
   
@@ -382,7 +382,7 @@
               
 
 <div id="jb-print-docs-body" class="onlyprint">
-    <h1>Covariance Structures and GLS: Workshop</h1>
+    <h1>PCHN63112 Workshop: Covariance Structures and GLS</h1>
     <!-- Table of contents -->
     <div id="print-main-content">
         <div id="jb-print-toc">
@@ -393,15 +393,17 @@
             <nav aria-label="Page">
                 <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-to-gls-to-more-complex-anova-models">Applying to GLS to More Complex ANOVA Models</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#between-subjects-factors">Between-subjects Factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#between-subjects-factors">Between-subjects Factors</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-covariance-structure">Building the Covariance Structure</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-and-visualisation">Inference and Visualisation</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-within-subject-factors">Multiple Within-subject Factors</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-structure-options">Covariance Structure Options</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-covariance-structures">Comparing Covariance Structures</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assumptions-and-visualisations">Assumptions and Visualisations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#assumptions-plots">Assumptions Plots</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualising-the-model">Visualising the Model</a></li>
 </ul>
 </li>
 </ul>
@@ -415,20 +417,19 @@
 <div id="searchbox"></div>
                 <article class="bd-article">
                   
-  <section class="tex2jax_ignore mathjax_ignore" id="covariance-structures-and-gls-workshop">
-<h1>Covariance Structures and GLS: Workshop<a class="headerlink" href="#covariance-structures-and-gls-workshop" title="Link to this heading">#</a></h1>
+  <section class="tex2jax_ignore mathjax_ignore" id="pchn63112-workshop-covariance-structures-and-gls">
+<h1>PCHN63112 Workshop: Covariance Structures and GLS<a class="headerlink" href="#pchn63112-workshop-covariance-structures-and-gls" title="Link to this heading">#</a></h1>
+<p>In the associated lesson, we discussed issues around inference when moving to more general covariance structures, as well as introducing GLS as a method that allows for a variety of different structures under repeated measurements. In this workshop, we will look at applying GLS to more complex models, returning to the factorial ANOVA datasets from the workshop last week. We will also look at how model comparisons can be used to choose between different covariance options, as well as how to examine the assumptions of a model fit using GLS.</p>
 <section id="applying-to-gls-to-more-complex-anova-models">
 <h2>Applying to GLS to More Complex ANOVA Models<a class="headerlink" href="#applying-to-gls-to-more-complex-anova-models" title="Link to this heading">#</a></h2>
+<p>In the lesson this week, we focussed on a simple application of GLS using a one-way ANOVA-style dataset. Now that we have seen the basic usage of the <code class="docutils literal notranslate"><span class="pre">gls()</span></code> function, we can explore more complex models and the additional choices they create.</p>
 <section id="between-subjects-factors">
 <h3>Between-subjects Factors<a class="headerlink" href="#between-subjects-factors" title="Link to this heading">#</a></h3>
+<p>Our first complication is adding a between-subjects factor to the model. Last week, we introduced the <code class="docutils literal notranslate"><span class="pre">anxiety</span></code> dataset from <code class="docutils literal notranslate"><span class="pre">datarium</span></code>, which we shall reuse for the following example. Refer to the workshop from last week for a description of these data. In the code below, we simply load the data and then reshape it into <em>long-format</em> so we can use it with <code class="docutils literal notranslate"><span class="pre">gls()</span></code>.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;datarium&#39;</span><span class="p">)</span>
 <span class="nf">library</span><span class="p">(</span><span class="s">&#39;reshape2&#39;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="s">&#39;nlme&#39;</span><span class="p">)</span>
-<span class="nf">library</span><span class="p">(</span><span class="s">&#39;car&#39;</span><span class="p">)</span>
-<span class="nf">suppressMessages</span><span class="p">(</span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;effects&#39;</span><span class="p">))</span>
-<span class="nf">suppressMessages</span><span class="p">(</span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;emmeans&#39;</span><span class="p">))</span>
 
 <span class="nf">data</span><span class="p">(</span><span class="s">&#39;anxiety&#39;</span><span class="p">)</span>
 
@@ -438,7 +439,7 @@
 
 <span class="c1"># reshape wide -&gt; long</span>
 <span class="n">anxiety.long</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">melt</span><span class="p">(</span><span class="n">anxiety</span><span class="p">,</span><span class="w">                 </span><span class="c1"># wide data frame</span>
-<span class="w">                     </span><span class="n">id.vars</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span><span class="s">&#39;group&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1"># both id and group stay fixed?</span>
+<span class="w">                     </span><span class="n">id.vars</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span><span class="s">&#39;group&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1"># both id and group stay fixed</span>
 <span class="w">                     </span><span class="n">variable.name</span><span class="o">=</span><span class="s">&#39;time&#39;</span><span class="p">,</span><span class="w">    </span><span class="c1"># name for the new predictor</span>
 <span class="w">                     </span><span class="n">value.name</span><span class="o">=</span><span class="s">&#39;score&#39;</span><span class="p">)</span><span class="w">      </span><span class="c1"># name for the new outcome</span>
 
@@ -447,23 +448,53 @@
 <span class="n">anxiety.long</span><span class="o">$</span><span class="n">id</span><span class="w">        </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">id</span><span class="p">)</span><span class="w">             </span><span class="c1"># id as factor</span>
 <span class="n">anxiety.long</span><span class="o">$</span><span class="n">group</span><span class="w">     </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">group</span><span class="p">)</span><span class="w">          </span><span class="c1"># group as factor</span>
 <span class="n">anxiety.long</span><span class="o">$</span><span class="n">time</span><span class="w">      </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">anxiety.long</span><span class="o">$</span><span class="n">time</span><span class="p">)</span><span class="w">           </span><span class="c1"># time as factor</span>
+
+<span class="nf">head</span><span class="p">(</span><span class="n">anxiety.long</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading required package: carData
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  id group time score
+1  1  grp1   t1  14.1
+2  1  grp1   t2  14.4
+3  1  grp1   t3  14.1
+4  2  grp1   t1  14.5
+5  2  grp1   t2  14.6
+6  2  grp1   t3  14.3
 </pre></div>
 </div>
 </div>
 </div>
+<p>As we can see, <code class="docutils literal notranslate"><span class="pre">time</span></code> is the repeated measurement, with only a single value of <code class="docutils literal notranslate"><span class="pre">score</span></code> per-repeat. The variable <code class="docutils literal notranslate"><span class="pre">group</span></code> is then a between-subjects factor, denoting which exercise group each subject is assigned to.</p>
+<div class="alert alert-block alert-info"> 
+<b>ACTIVITY ?</b> Can you determine whether these data are <i>balanced</i> or <i>unbalanced</i> with respect to <code>group</code>? Thinking back to last semester, what implications does this have for inference?
+</div><p>Modelling these data with <code class="docutils literal notranslate"><span class="pre">gls()</span></code> is simple in terms of the <em>mean function</em>, as this is identical to how we would fit a 2-way ANOVA model using <code class="docutils literal notranslate"><span class="pre">lm()</span></code>. We simply use <code class="docutils literal notranslate"><span class="pre">score</span> <span class="pre">~</span> <span class="pre">group</span> <span class="pre">+</span> <span class="pre">time</span> <span class="pre">+</span> <span class="pre">group:time</span></code> or <code class="docutils literal notranslate"><span class="pre">score</span> <span class="pre">~</span> <span class="pre">group*time</span></code>. The more pressing concern comes from decisions around the covariance structure.</p>
+<section id="building-the-covariance-structure">
+<h4>Building the Covariance Structure<a class="headerlink" href="#building-the-covariance-structure" title="Link to this heading">#</a></h4>
+<p>Starting with the correlation, there are no replications per-repeated measurement, meaning we do not need to take <code class="docutils literal notranslate"><span class="pre">time</span></code> into account when building this (refer back to the dropdown in the lesson labelled <code class="docutils literal notranslate"><span class="pre">A</span> <span class="pre">More</span> <span class="pre">Complex</span> <span class="pre">Structure</span></code>). As such, the most general correlation structure we can provide is given by <code class="docutils literal notranslate"><span class="pre">corSymm(form=</span> <span class="pre">~1|id)</span></code>. We will start with this and can examine whether a simpler structure is supported by the data a little later. So we start with the model</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;nlme&#39;</span><span class="p">)</span>
+<span class="n">anxiety.gls</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">group</span><span class="o">*</span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">anxiety.long</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>This accommodates the correlation inherent in the repeated measurements. However, the addition of <code class="docutils literal notranslate"><span class="pre">group</span></code> provides further opportunity to consider homogeneity of variance. As a starting point, we will model each level of <code class="docutils literal notranslate"><span class="pre">group</span></code> using a separate variance term, under the assumption that different exercise regimes may result in different fluctuations in anxiety scores. To do this, we use <code class="docutils literal notranslate"><span class="pre">varIdent(form=</span> <span class="pre">~1|group)</span></code> and update the model as follows</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
 <div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">anxiety.gls</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">group</span><span class="o">*</span><span class="n">time</span><span class="p">,</span><span class="w"> </span>
-<span class="w">                   </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span>
-<span class="w">                   </span><span class="n">weights</span><span class="o">=</span><span class="nf">varIdent</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">group</span><span class="p">),</span><span class="w"> </span><span class="c1"># varIdent(form= ~1|time) </span>
+<span class="w">                   </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="c1"># unconstrained correlation</span>
+<span class="w">                   </span><span class="n">weights</span><span class="o">=</span><span class="nf">varIdent</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">group</span><span class="p">),</span><span class="w"> </span><span class="c1"># different variance per-group</span>
 <span class="w">                   </span><span class="n">data</span><span class="o">=</span><span class="n">anxiety.long</span><span class="p">)</span>
-
-<span class="nf">print</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+<p>Ignoring inference for the moment, we can print the model fit and check everything is as expected</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
@@ -500,13 +531,58 @@ Residual standard error: 1.579195
 </div>
 </div>
 </div>
+<p>So, we have 3 separate parameters to model the correlation across time within each individual, as well as 3 separate variances to model each of the separate groups.</p>
+<div class="alert alert-block alert-info"> 
+<b>ACTIVITY ?</b> Before continuing, can you guess what sort of covariance structure you will see if you extract the variance-covariance matrix for one subjects from each of the exercise groups?
+</div><p>We can now examine the structure that has been fit for each subject within each exercise group. As there are 15 subjects per-group, we just extract the covariance structure associated with the first subject in each group.</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">Anova</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">)</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">,</span><span class="w"> </span><span class="n">individual</span><span class="o">=</span><span class="s">&#39;1&#39;</span><span class="p">))</span><span class="w">  </span><span class="c1"># grp1</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">,</span><span class="w"> </span><span class="n">individual</span><span class="o">=</span><span class="s">&#39;16&#39;</span><span class="p">))</span><span class="w"> </span><span class="c1"># grp2</span>
+<span class="nf">print</span><span class="p">(</span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">,</span><span class="w"> </span><span class="n">individual</span><span class="o">=</span><span class="s">&#39;31&#39;</span><span class="p">))</span><span class="w"> </span><span class="c1"># grp3</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Marginal variance covariance matrix
+       [,1]   [,2]   [,3]
+[1,] 2.4939 2.4232 2.3734
+[2,] 2.4232 2.4939 2.4197
+[3,] 2.3734 2.4197 2.4939
+  Standard Deviations: 1.5792 1.5792 1.5792 
+Marginal variance covariance matrix
+       [,1]   [,2]   [,3]
+[1,] 2.3133 2.2478 2.2016
+[2,] 2.2478 2.3133 2.2445
+[3,] 2.2016 2.2445 2.3133
+  Standard Deviations: 1.521 1.521 1.521 
+Marginal variance covariance matrix
+       [,1]   [,2]   [,3]
+[1,] 2.3869 2.3193 2.2716
+[2,] 2.3193 2.3869 2.3159
+[3,] 2.2716 2.3159 2.3869
+  Standard Deviations: 1.545 1.545 1.545 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-block alert-info"> 
+<b>ACTIVITY ?</b> Why is the variance <i>constant</i> within each group? How could the <code>weights=</code> argument be adjusted to allow the variance to differ per-timepoint? <b>HINT:</b> You can use <code>varComb()</code> to combine multiple variance specifications e.g. <code>weights=varComb(varIdent(form= ...), varIdent(form= ...))</code>
+</div></section>
+<section id="inference-and-visualisation">
+<h4>Inference and Visualisation<a class="headerlink" href="#inference-and-visualisation" title="Link to this heading">#</a></h4>
+<p>Inference follows the typical pattern of requesting an ANOVA table, visualising the effects and creating follow-up tests. To start with, we can use <code class="docutils literal notranslate"><span class="pre">Anova()</span></code> from <code class="docutils literal notranslate"><span class="pre">car</span></code> for the omnibus test</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;car&#39;</span><span class="p">)</span>
+<span class="nf">Anova</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Loading required package: carData
+</pre></div>
+</div>
 <div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Analysis of Deviance Table (Type II tests)
 
 Response: score
@@ -521,84 +597,59 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 </div>
 </div>
 <p>Notice that this does not require specification of a different error term for <code class="docutils literal notranslate"><span class="pre">group</span></code>, as the traditional repeated measures ANOVA would. Instead, the correct denominator is extracted from the variance-covariance matrix. So there is no need to even think about whether the test statistics are using the correct partition of error variance, the model takes care of this <em>automatically</em>.</p>
+<p>Given these results, we may wish to visualise the 2-way interaction</p>
 <div class="cell docutils container">
 <div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">plot</span><span class="p">(</span><span class="nf">effect</span><span class="p">(</span><span class="s">&#39;group:time&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">mod</span><span class="o">=</span><span class="n">anxiety.gls</span><span class="p">,</span><span class="w"> </span><span class="n">residuals</span><span class="o">=</span><span class="kc">TRUE</span><span class="p">),</span><span class="w"> </span><span class="n">partial.residuals</span><span class="o">=</span><span class="nf">list</span><span class="p">(</span><span class="n">smooth</span><span class="o">=</span><span class="kc">FALSE</span><span class="p">))</span>
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;effects&#39;</span><span class="p">)</span>
+<span class="nf">plot</span><span class="p">(</span><span class="nf">effect</span><span class="p">(</span><span class="s">&#39;group:time&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">x.var</span><span class="o">=</span><span class="s">&#39;time&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">mod</span><span class="o">=</span><span class="n">anxiety.gls</span><span class="p">))</span>
 </pre></div>
 </div>
 </div>
 <div class="cell_output docutils container">
-<img alt="_images/8baf01750d925c68f639f2df5f0f615527f2aa40f8e8a3f740f82f64149be1ba.png" src="_images/8baf01750d925c68f639f2df5f0f615527f2aa40f8e8a3f740f82f64149be1ba.png" />
+<img alt="_images/010270e640e27cacca115b62b7bce791e81b81adb95ed405d29cfd95c1fe681d.png" src="_images/010270e640e27cacca115b62b7bce791e81b81adb95ed405d29cfd95c1fe681d.png" />
 </div>
 </div>
+<p>where it would appear that <code class="docutils literal notranslate"><span class="pre">grp1</span></code> shows a very subtle effect of <code class="docutils literal notranslate"><span class="pre">time</span></code>, <code class="docutils literal notranslate"><span class="pre">grp2</span></code> shows a clearer effect of <code class="docutils literal notranslate"><span class="pre">time</span></code> and <code class="docutils literal notranslate"><span class="pre">grp3</span></code> shows a very clear effect of <code class="docutils literal notranslate"><span class="pre">time</span></code>. We can also follow this effect up with some tests using <code class="docutils literal notranslate"><span class="pre">emmeans()</span></code>. Again, this follows the <em>same</em> analysis pattern we have used previously.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;emmeans&#39;</span><span class="p">)</span>
+<span class="n">emm</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">emmeans</span><span class="p">(</span><span class="n">anxiety.gls</span><span class="p">,</span><span class="w"> </span><span class="n">pairwise</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="o">|</span><span class="n">group</span><span class="p">,</span><span class="w"> </span><span class="n">mode</span><span class="o">=</span><span class="s">&#39;asymptotic&#39;</span><span class="p">,</span><span class="w"> </span><span class="n">adjust</span><span class="o">=</span><span class="s">&#39;holm&#39;</span><span class="p">)</span>
+<span class="nf">print</span><span class="p">(</span><span class="n">emm</span><span class="o">$</span><span class="n">contrasts</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>group = grp1:
+ contrast estimate     SE  df z.ratio p.value
+ t1 - t2      0.16 0.0970 Inf   1.649  0.0992
+ t1 - t3      0.58 0.1270 Inf   4.576  &lt;.0001
+ t2 - t3      0.42 0.0994 Inf   4.223  &lt;.0001
+
+group = grp2:
+ contrast estimate     SE  df z.ratio p.value
+ t1 - t2      0.18 0.0935 Inf   1.926  0.0541
+ t1 - t3      1.12 0.1220 Inf   9.176  &lt;.0001
+ t2 - t3      0.94 0.0958 Inf   9.814  &lt;.0001
+
+group = grp3:
+ contrast estimate     SE  df z.ratio p.value
+ t1 - t2      2.00 0.0949 Inf  21.066  &lt;.0001
+ t1 - t3      3.45 0.1240 Inf  27.852  &lt;.0001
+ t2 - t3      1.45 0.0973 Inf  14.938  &lt;.0001
+
+Degrees-of-freedom method: asymptotic 
+P value adjustment: holm method for 3 tests 
+</pre></div>
+</div>
+</div>
+</div>
+<div class="alert alert-block alert-info"> 
+<b>ACTIVITY ?</b> Print out the results of <code>emm$emmeans</code> from the code above. This provides the standard errors for each of the cell means. The error bars in the plot above are 95% confidence intervals, which are approximately 1.96 x SE. Given this, why do the bars overlap so much, despite how significant some of the effects are? <b>HINT:</b> Compare the <code>SE</code> reported in <code>emm$emmeans</code> to the <code>SE</code> on the <i>differences</i> reported in <code>emm$contrasts</code>. Think about what you know about the variance of <i>differences</i> under dependence. How does this affect how you interpret the confidence intervals in the plots?
+</div></section>
 </section>
 <section id="multiple-within-subject-factors">
 <h3>Multiple Within-subject Factors<a class="headerlink" href="#multiple-within-subject-factors" title="Link to this heading">#</a></h3>
 </section>
-</section>
-<section id="covariance-structure-options">
-<h2>Covariance Structure Options<a class="headerlink" href="#covariance-structure-options" title="Link to this heading">#</a></h2>
-<p>… Importantly, decisions between these structures either has to be <em>theoretically</em> motivated, or we have to use the <em>data</em> to see which structure has the most evidence in its favour. Although we can reason about the structure of this matrix, this is often quite hard to do in practice and needs quite deep knowledge of the phenomena under question. As such, it is much more typical to consider all possible <em>reasonable</em> structures and then use model comparisons to choose between them. For the moment, we will focus on the structures, but at the end of this part of the lesson we will see how to use the <em>data</em> to choose between them.</p>
-<p>So, in terms of <em>reasonable</em> structures, we will constraint ourselves to either <em>fixing</em> all correlations to a single value (i.e. compound symmetry) or allowing all correlations to <em>freely vary</em> (i.e. an unconstrained structure). On top of this, we can also consider <em>fixing</em> all variances to a single value (i.e. homogeneity of variance) or allowing all variances to <em>freely vary</em> (i.e. heterogeneity of variance). So this gives us 4 possible combinations of <code class="docutils literal notranslate"><span class="pre">correlation</span></code> and <code class="docutils literal notranslate"><span class="pre">weights</span></code> structures to try.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">gls.mod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corCompSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">weights</span><span class="o">=</span><span class="nf">varIdent</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="m">1</span><span class="o">|</span><span class="n">time</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">selfesteem.long</span><span class="p">)</span>
-
-<span class="n">Sigma.1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">,</span><span class="w"> </span><span class="n">individual</span><span class="o">=</span><span class="s">&#39;1&#39;</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">)</span>
-<span class="nf">image</span><span class="p">(</span><span class="nf">as</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Matrix&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-<div class="cell_output docutils container">
-<div class="output traceback highlight-ipythontb notranslate"><div class="highlight"><pre><span></span><span class="ne">Error</span>:
-
-<span class="o">!</span><span class="w"> </span>object<span class="w"> </span><span class="s1">&#39;selfesteem.long&#39;</span><span class="w"> </span>not<span class="w"> </span>found
-
-    <span class="err">▆</span>
-
-<span class="g g-Whitespace"> </span><span class="mi">1</span><span class="o">.</span> <span class="err">└─</span><span class="n">nlme</span><span class="p">::</span><span class="n">gls</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
-
-<span class="g g-Whitespace"> </span><span class="mi">2</span><span class="o">.</span>   <span class="err">├─</span><span class="n">stats</span><span class="p">::</span><span class="n">terms</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
-
-<span class="g g-Whitespace"> </span><span class="mi">3</span><span class="o">.</span>   <span class="err">└─</span><span class="n">stats</span><span class="p">::</span><span class="n">terms</span><span class="o">.</span><span class="n">formula</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">data</span> <span class="o">=</span> <span class="n">data</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>So, here we can see that we have created a variance-covariance matrix where <em>both</em> the diagonal and off-diagonal elements are not different. However, this has been achieved using only a <em>single</em> correlation parameter. So, in reality, the correlation between the repeated measurements remains <em>fixed</em>. We can see this by converting the variance-covariance matrix into a correlation matrix, using the <code class="docutils literal notranslate"><span class="pre">cov2cor()</span></code> function</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">print</span><span class="p">(</span><span class="nf">cov2cor</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>So, the only reason the covariance is <em>different</em> is because the correlation is being scaled differently by the different variances. So do not be mislead. This structure is exactly what you would get from allowing heterogeneity of variance, even with a fixed correlation. So despite appearances, this is still quite a <em>restrictive structure</em>.</p>
-<p>In order to allow the correlations to <em>actually differ</em> between the repeated measurements, we need to use the <code class="docutils literal notranslate"><span class="pre">corSymm()</span></code> structure. This specifies an <em>unstructured</em> symmetric covariance matrix, where each off-diagonal element can be <em>any value</em>. This allows the data to determine the magnitude and direction of each individual correlation between the repeated measurements.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">gls.mod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">selfesteem.long</span><span class="p">)</span>
-
-<span class="n">Sigma.1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">,</span><span class="w"> </span><span class="n">individual</span><span class="o">=</span><span class="s">&#39;1&#39;</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">)</span>
-<span class="nf">image</span><span class="p">(</span><span class="nf">as</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Matrix&quot;</span><span class="p">))</span>
-</pre></div>
-</div>
-</div>
-</div>
-<p>This time, we have kept the variances <em>fixed</em> but have allowed the <em>correlation</em> to change between the repeated measurements.</p>
-<div class="cell docutils container">
-<div class="cell_input docutils container">
-<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">gls.mod</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">score</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">weights</span><span class="o">=</span><span class="nf">varIdent</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">time</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">selfesteem.long</span><span class="p">)</span>
-<span class="n">Sigma.1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">getVarCov</span><span class="p">(</span><span class="n">gls.mod</span><span class="p">,</span><span class="w"> </span><span class="n">individual</span><span class="o">=</span><span class="s">&#39;1&#39;</span><span class="p">)</span>
-<span class="n">Sigma.1</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">,</span><span class="w"> </span><span class="s">&quot;Matrix&quot;</span><span class="p">)</span>
-<span class="nf">print</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">)</span>
-<span class="nf">image</span><span class="p">(</span><span class="n">Sigma.1</span><span class="p">)</span>
-</pre></div>
-</div>
-</div>
-</div>
 </section>
 <section id="comparing-covariance-structures">
 <h2>Comparing Covariance Structures<a class="headerlink" href="#comparing-covariance-structures" title="Link to this heading">#</a></h2>
@@ -680,9 +731,6 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 </div>
 <p>which does appear qualitatively <em>worse</em>, thus suggesting that a more complex covariance structure provides a better model fit.</p>
 </section>
-<section id="visualising-the-model">
-<h3>Visualising the Model<a class="headerlink" href="#visualising-the-model" title="Link to this heading">#</a></h3>
-</section>
 </section>
 </section>
 
@@ -734,15 +782,17 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
   <nav class="bd-toc-nav page-toc">
     <ul class="visible nav section-nav flex-column">
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#applying-to-gls-to-more-complex-anova-models">Applying to GLS to More Complex ANOVA Models</a><ul class="nav section-nav flex-column">
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#between-subjects-factors">Between-subjects Factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#between-subjects-factors">Between-subjects Factors</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#building-the-covariance-structure">Building the Covariance Structure</a></li>
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-and-visualisation">Inference and Visualisation</a></li>
+</ul>
+</li>
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-within-subject-factors">Multiple Within-subject Factors</a></li>
 </ul>
 </li>
-<li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#covariance-structure-options">Covariance Structure Options</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-covariance-structures">Comparing Covariance Structures</a></li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#assumptions-and-visualisations">Assumptions and Visualisations</a><ul class="nav section-nav flex-column">
 <li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#assumptions-plots">Assumptions Plots</a></li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#visualising-the-model">Visualising the Model</a></li>
 </ul>
 </li>
 </ul>
