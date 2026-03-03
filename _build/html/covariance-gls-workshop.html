@@ -398,7 +398,10 @@
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-and-visualisation">Inference and Visualisation</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-within-subject-factors">Multiple Within-subject Factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-within-subject-factors">Multiple Within-subject Factors</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Building the Covariance Structure</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-covariance-structures">Comparing Covariance Structures</a></li>
@@ -505,12 +508,10 @@
   Log-restricted-likelihood: -125.3603
 
 Coefficients:
-     (Intercept)        groupgrp2        groupgrp3           timet2 
-     17.08666667      -0.44000000      -0.07333333      -0.16000000 
-          timet3 groupgrp2:timet2 groupgrp3:timet2 groupgrp2:timet3 
-     -0.58000000      -0.02000000      -1.84000000      -0.54000000 
-groupgrp3:timet3 
-     -2.87333333 
+     (Intercept)        groupgrp2        groupgrp3           timet2           timet3 groupgrp2:timet2 groupgrp3:timet2 
+     17.08666667      -0.44000000      -0.07333333      -0.16000000      -0.58000000      -0.02000000      -1.84000000 
+groupgrp2:timet3 groupgrp3:timet3 
+     -0.54000000      -2.87333333 
 
 Correlation Structure: General
  Formula: ~1 | id 
@@ -606,6 +607,10 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 </div>
 </div>
 <div class="cell_output docutils container">
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>lattice theme set by effectsTheme()
+See ?effectsTheme for details.
+</pre></div>
+</div>
 <img alt="_images/010270e640e27cacca115b62b7bce791e81b81adb95ed405d29cfd95c1fe681d.png" src="_images/010270e640e27cacca115b62b7bce791e81b81adb95ed405d29cfd95c1fe681d.png" />
 </div>
 </div>
@@ -619,7 +624,10 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 </div>
 </div>
 <div class="cell_output docutils container">
-<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>group = grp1:
+<div class="output stream highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>Welcome to emmeans.
+Caution: You lose important information if you filter this package&#39;s results.
+See &#39;? untidy&#39;
+group = grp1:
  contrast estimate     SE  df z.ratio p.value
  t1 - t2      0.16 0.0970 Inf   1.649  0.0992
  t1 - t3      0.58 0.1270 Inf   4.576  &lt;.0001
@@ -649,6 +657,80 @@ P value adjustment: holm method for 3 tests
 </section>
 <section id="multiple-within-subject-factors">
 <h3>Multiple Within-subject Factors<a class="headerlink" href="#multiple-within-subject-factors" title="Link to this heading">#</a></h3>
+<p>Sticking with the theme of revisiting analyses covered in last week’s workshop, our second complication is when we have <em>multiple</em> within-subject factors. We will again use the <code class="docutils literal notranslate"><span class="pre">weightloss</span></code> data from <code class="docutils literal notranslate"><span class="pre">datarium</span></code> to illustrate this, which we load, convert to long-format and print for a single subject below</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">library</span><span class="p">(</span><span class="s">&#39;datarium&#39;</span><span class="p">)</span>
+<span class="nf">library</span><span class="p">(</span><span class="s">&#39;reshape2&#39;</span><span class="p">)</span>
+
+<span class="nf">data</span><span class="p">(</span><span class="s">&#39;weightloss&#39;</span><span class="p">)</span>
+
+<span class="c1"># repeats and number of subjects</span>
+<span class="n">t</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">12</span><span class="w"> </span><span class="c1"># 2 * 2 * 3</span>
+<span class="n">n</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="m">12</span>
+
+<span class="c1"># reshape wide -&gt; long</span>
+<span class="n">weightloss.long</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">melt</span><span class="p">(</span><span class="n">weightloss</span><span class="p">,</span><span class="w">                         </span><span class="c1"># wide data frame</span>
+<span class="w">                        </span><span class="n">id.vars</span><span class="o">=</span><span class="nf">c</span><span class="p">(</span><span class="s">&#39;id&#39;</span><span class="p">,</span><span class="s">&#39;diet&#39;</span><span class="p">,</span><span class="s">&#39;exercises&#39;</span><span class="p">),</span><span class="w"> </span><span class="c1"># what stays fixed?</span>
+<span class="w">                        </span><span class="n">variable.name</span><span class="o">=</span><span class="s">&quot;time&quot;</span><span class="p">,</span><span class="w">               </span><span class="c1"># name for the new predictor</span>
+<span class="w">                        </span><span class="n">value.name</span><span class="o">=</span><span class="s">&quot;weight&quot;</span><span class="p">)</span><span class="w">                </span><span class="c1"># name for the new outcome</span>
+
+<span class="n">weightloss.long</span><span class="w">           </span><span class="o">&lt;-</span><span class="w"> </span><span class="n">weightloss.long</span><span class="p">[</span><span class="nf">order</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">id</span><span class="p">),]</span><span class="w"> </span><span class="c1"># order by ID</span>
+<span class="nf">rownames</span><span class="p">(</span><span class="n">weightloss.long</span><span class="p">)</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">seq</span><span class="p">(</span><span class="m">1</span><span class="p">,</span><span class="n">n</span><span class="o">*</span><span class="n">t</span><span class="p">)</span><span class="w">                                  </span><span class="c1"># fix row names</span>
+
+<span class="n">weightloss.long</span><span class="o">$</span><span class="n">id</span><span class="w">        </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">id</span><span class="p">)</span><span class="w">               </span><span class="c1"># id as factor</span>
+<span class="n">weightloss.long</span><span class="o">$</span><span class="n">diet</span><span class="w">      </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">diet</span><span class="p">)</span><span class="w">             </span><span class="c1"># diet as factor</span>
+<span class="n">weightloss.long</span><span class="o">$</span><span class="n">exercises</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">exercises</span><span class="p">)</span><span class="w">        </span><span class="c1"># exercises as factor</span>
+<span class="n">weightloss.long</span><span class="o">$</span><span class="n">time</span><span class="w">      </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.factor</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">time</span><span class="p">)</span><span class="w">             </span><span class="c1"># time as factor</span>
+
+<span class="n">weightloss.long</span><span class="p">[</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">id</span><span class="w"> </span><span class="o">==</span><span class="w"> </span><span class="s">&#39;1&#39;</span><span class="p">,]</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>   id diet exercises time weight
+1   1   no        no   t1  10.43
+2   1   no       yes   t1  11.12
+3   1  yes        no   t1  10.20
+4   1  yes       yes   t1  10.43
+5   1   no        no   t2  13.21
+6   1   no       yes   t2  12.51
+7   1  yes        no   t2  12.51
+8   1  yes       yes   t2  12.51
+9   1   no        no   t3  11.59
+10  1   no       yes   t3  15.76
+11  1  yes        no   t3  14.60
+12  1  yes       yes   t3  14.37
+</pre></div>
+</div>
+</div>
+</div>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="nf">as.numeric</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">time</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="cell_output docutils container">
+<div class="output text_plain highlight-myst-ansi notranslate"><div class="highlight"><pre><span></span>  [1] 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3
+ [61] 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3
+[121] 1 1 1 1 2 2 2 2 3 3 3 3 1 1 1 1 2 2 2 2 3 3 3 3
+</pre></div>
+</div>
+</div>
+</div>
+<section id="id1">
+<h4>Building the Covariance Structure<a class="headerlink" href="#id1" title="Link to this heading">#</a></h4>
+<p>Starting with the correlation, the difference with this example is that there are now 12 values for each subject, meaning that a fully unconstrained covariance structure will have <span class="math notranslate nohighlight">\(\frac{12 \times 13}{2} = 78\)</span> parameters to estimate. This is quite a lot.</p>
+<div class="cell docutils container">
+<div class="cell_input docutils container">
+<div class="highlight-r notranslate"><div class="highlight"><pre><span></span><span class="n">t</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">as.numeric</span><span class="p">(</span><span class="n">weightloss.long</span><span class="o">$</span><span class="n">time</span><span class="p">)</span>
+<span class="n">weightloss.gls</span><span class="w"> </span><span class="o">&lt;-</span><span class="w"> </span><span class="nf">gls</span><span class="p">(</span><span class="n">weight</span><span class="w"> </span><span class="o">~</span><span class="w"> </span><span class="n">diet</span><span class="o">*</span><span class="n">exercises</span><span class="o">*</span><span class="n">time</span><span class="p">,</span><span class="w"> </span><span class="n">correlation</span><span class="o">=</span><span class="nf">corSymm</span><span class="p">(</span><span class="n">form</span><span class="o">=</span><span class="w"> </span><span class="o">~</span><span class="m">1</span><span class="o">|</span><span class="n">id</span><span class="p">),</span><span class="w"> </span><span class="n">data</span><span class="o">=</span><span class="n">weightloss.long</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+</div>
+</section>
 </section>
 </section>
 <section id="comparing-covariance-structures">
@@ -787,7 +869,10 @@ P value adjustment: holm method for 3 tests
 <li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#inference-and-visualisation">Inference and Visualisation</a></li>
 </ul>
 </li>
-<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-within-subject-factors">Multiple Within-subject Factors</a></li>
+<li class="toc-h3 nav-item toc-entry"><a class="reference internal nav-link" href="#multiple-within-subject-factors">Multiple Within-subject Factors</a><ul class="nav section-nav flex-column">
+<li class="toc-h4 nav-item toc-entry"><a class="reference internal nav-link" href="#id1">Building the Covariance Structure</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toc-h2 nav-item toc-entry"><a class="reference internal nav-link" href="#comparing-covariance-structures">Comparing Covariance Structures</a></li>
